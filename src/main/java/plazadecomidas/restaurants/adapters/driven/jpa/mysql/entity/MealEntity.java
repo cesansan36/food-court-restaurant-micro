@@ -30,7 +30,7 @@ public class MealEntity {
     @Column(name = "image_url")
     private String imageUrl;
     @Column(name = "is_active")
-    private boolean isActive;
+    private boolean active;
     @ManyToOne
     @JoinColumn(name = "id_restaurant")
     private RestaurantEntity restaurant;

@@ -16,4 +16,22 @@ public class MealUseCase implements IMealServicePort {
     public void saveMeal(Meal meal) {
         mealPersistencePort.saveMeal(meal);
     }
+
+    @Override
+    public void updateMeal(Meal meal) {
+
+        Meal previousMeal = mealPersistencePort.getByName(meal.getName());
+
+        Meal updatedValuesMeal = new Meal(
+                previousMeal.getId(),
+                previousMeal.getName(),
+                meal.getDescription(),
+                meal.getPrice(),
+                previousMeal.getImageUrl(),
+                previousMeal.isActive(),
+                previousMeal.getRestaurant(),
+                previousMeal.getCategory());
+
+        mealPersistencePort.updateMeal(updatedValuesMeal);
+    }
 }

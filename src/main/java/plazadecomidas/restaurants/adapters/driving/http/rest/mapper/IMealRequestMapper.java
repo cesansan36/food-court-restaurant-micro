@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddMealRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateMealRequest;
 import plazadecomidas.restaurants.domain.model.Category;
 import plazadecomidas.restaurants.domain.model.Meal;
 import plazadecomidas.restaurants.domain.model.Restaurant;
@@ -16,6 +17,13 @@ public interface IMealRequestMapper {
     @Mapping(target = "category", source = "categoryId", qualifiedByName = "mapCategory")
     @Mapping(target = "restaurant", source = "restaurantId", qualifiedByName = "mapRestaurant")
     Meal addMealRequestToMeal(AddMealRequest addMealRequest);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "imageUrl", constant = "Dummy")
+    @Mapping(target = "isActive", constant = "true")
+    @Mapping(target = "category", constant = "0" , qualifiedByName = "mapCategory")
+    @Mapping(target = "restaurant", constant = "0", qualifiedByName = "mapRestaurant")
+    Meal updateMealRequestToMeal(UpdateMealRequest updateMealRequest);
 
     @Named("mapCategory")
     default Category mapCategory(Long categoryId) {

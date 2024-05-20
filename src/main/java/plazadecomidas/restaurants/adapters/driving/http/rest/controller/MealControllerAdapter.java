@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddMealRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateMealRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IMealRequestMapper;
 import plazadecomidas.restaurants.domain.model.Meal;
 import plazadecomidas.restaurants.domain.primaryport.IMealServicePort;
@@ -25,5 +27,13 @@ public class MealControllerAdapter {
         Meal meal = mealRequestMapper.addMealRequestToMeal(addMealRequest);
         mealServicePort.saveMeal(meal);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PutMapping("update")
+    public ResponseEntity<Void> updateMeal(@RequestBody UpdateMealRequest updateMealRequest) {
+        Meal meal = mealRequestMapper.updateMealRequestToMeal(updateMealRequest);
+
+        mealServicePort.updateMeal(meal);
+        return ResponseEntity.ok().build();
     }
 }
