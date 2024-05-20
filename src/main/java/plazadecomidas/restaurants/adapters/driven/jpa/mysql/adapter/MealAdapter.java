@@ -41,6 +41,12 @@ public class MealAdapter implements IMealPersistencePort {
 
     @Override
     public void updateMeal(Meal meal) {
+        Optional<MealEntity> foundMeal = mealRepository.findByName(meal.getName());
+
+        if (foundMeal.isEmpty()) {
+            throw new RegistryNotFoundException(PersistenceConstants.MEAL_NOT_FOUND_MESSAGE);
+        }
+
         mealRepository.save(mealEntityMapper.toEntity(meal));
     }
 }
