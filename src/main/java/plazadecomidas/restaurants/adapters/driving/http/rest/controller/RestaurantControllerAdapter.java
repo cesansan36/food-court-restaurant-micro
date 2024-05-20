@@ -22,7 +22,8 @@ public class RestaurantControllerAdapter {
     @PostMapping("register/restaurant")
     public ResponseEntity<Void> addRestaurant(@RequestBody AddRestaurantRequest addRestaurantRequest) {
 
-        restaurantServicePort.saveRestaurant(restaurantRequestMapper.addRestaurantRequestToRestaurant(addRestaurantRequest));
+        restaurantServicePort.saveRestaurant(
+                restaurantRequestMapper.addRestaurantRequestToRestaurant(addRestaurantRequest));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
