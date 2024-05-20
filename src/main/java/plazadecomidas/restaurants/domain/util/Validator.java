@@ -29,4 +29,8 @@ public class Validator {
     public static boolean isValidName(String name) {
         return ALPHANUMERIC_WITH_AT_LEAST_ONE_LETTER_REGEX.matcher(name).matches();
     }
+
+    public static boolean isValidPrice(Long price) {
+        return price > 0;
+    }
 }

@@ -1,6 +1,5 @@
 package plazadecomidas.restaurants.adapters.driving.http.rest.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,9 +12,7 @@ import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddRest
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IRestaurantRequestMapper;
 import plazadecomidas.restaurants.domain.primaryport.IRestaurantServicePort;
 
-import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -23,7 +20,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class RestaurantControllerAdapterTest {

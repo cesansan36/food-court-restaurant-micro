@@ -37,22 +37,22 @@ public class Restaurant {
     private void validateFields(String name, String address, Long ownerId, String phoneNumber, String logoUrl, String nit) {
 
         if (Validator.isFieldEmpty(name)) {
-            throw new EmptyFieldException(String.format(DomainConstants.EMPTY_FIELD_MESSAGE, DomainConstants.Fields.NAME));
+            throw new EmptyFieldException(String.format(DomainConstants.EMPTY_FIELD_MESSAGE, DomainConstants.RestaurantFields.NAME));
         }
         if (Validator.isFieldEmpty(address)) {
-            throw new EmptyFieldException(String.format(DomainConstants.EMPTY_FIELD_MESSAGE, DomainConstants.Fields.ADDRESS));
+            throw new EmptyFieldException(String.format(DomainConstants.EMPTY_FIELD_MESSAGE, DomainConstants.RestaurantFields.ADDRESS));
         }
         if (ownerId == null) {
-            throw new EmptyFieldException(String.format(DomainConstants.EMPTY_FIELD_MESSAGE, DomainConstants.Fields.OWNER_ID));
+            throw new EmptyFieldException(String.format(DomainConstants.EMPTY_FIELD_MESSAGE, DomainConstants.RestaurantFields.OWNER_ID));
         }
         if (Validator.isFieldEmpty(phoneNumber)) {
-            throw new EmptyFieldException(String.format(DomainConstants.EMPTY_FIELD_MESSAGE, DomainConstants.Fields.PHONE_NUMBER));
+            throw new EmptyFieldException(String.format(DomainConstants.EMPTY_FIELD_MESSAGE, DomainConstants.RestaurantFields.PHONE_NUMBER));
         }
         if (Validator.isFieldEmpty(logoUrl)) {
-            throw new EmptyFieldException(String.format(DomainConstants.EMPTY_FIELD_MESSAGE, DomainConstants.Fields.LOGO_URL));
+            throw new EmptyFieldException(String.format(DomainConstants.EMPTY_FIELD_MESSAGE, DomainConstants.RestaurantFields.LOGO_URL));
         }
         if (Validator.isFieldEmpty(nit)) {
-            throw new EmptyFieldException(String.format(DomainConstants.EMPTY_FIELD_MESSAGE, DomainConstants.Fields.NIT));
+            throw new EmptyFieldException(String.format(DomainConstants.EMPTY_FIELD_MESSAGE, DomainConstants.RestaurantFields.NIT));
         }
 
         if (!Validator.isValidNit(nit)) {

@@ -15,7 +15,7 @@ public class PersistenceTestData {
             DomainTestData.ADDRESS_FIELD.formatted(id),
             idOwner,
             DomainTestData.PHONE_NUMBER_FIELD.formatted(id),
-            DomainTestData.LOGO_URL_FIELD.formatted(id),
+            DomainTestData.IMG_URL_FIELD.formatted(id),
             DomainTestData.NIT_FIELD.formatted(id)
         );
     }
