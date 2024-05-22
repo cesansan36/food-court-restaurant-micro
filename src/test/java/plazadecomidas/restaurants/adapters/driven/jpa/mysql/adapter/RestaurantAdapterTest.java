@@ -12,11 +12,13 @@ import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IRestaurantEn
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IRestaurantRepository;
 import plazadecomidas.restaurants.domain.model.Restaurant;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -95,5 +97,18 @@ class RestaurantAdapterTest {
         assertThrows(RegistryNotFoundException.class, () -> restaurantAdapter.existsRestaurantOwnerPair(1L, 1L));
 
         verify(restaurantRepository, times(1)).findByIdAndOwnerId(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("Get all restaurants")
+    void getAllRestaurants() {
+        List<RestaurantEntity> restaurantEntities = List.of(PersistenceTestData.getValidRestaurantEntity(1L, 1L));
+        List<Restaurant> restaurants = List.of(DomainTestData.getValidRestaurant(1L, 1L));
+
+        when(restaurantRepository.findAll()).thenReturn(restaurantEntities);
+        when(restaurantEntityMapper.toDomainList(anyList())).thenReturn(restaurants);
+
+        restaurantAdapter.getAllRestaurants();
+        verify(restaurantRepository, times(1)).findAll();
     }
 }

@@ -9,17 +9,25 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddRestaurantRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.response.RestaurantResponse;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IRestaurantRequestMapper;
+import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IRestaurantResponseMapper;
+import plazadecomidas.restaurants.domain.model.Restaurant;
 import plazadecomidas.restaurants.domain.primaryport.IRestaurantServicePort;
 
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class RestaurantControllerAdapterTest {
@@ -28,6 +36,7 @@ class RestaurantControllerAdapterTest {
 
     private IRestaurantServicePort restaurantServicePort;
     private IRestaurantRequestMapper restaurantRequestMapper;
+    private IRestaurantResponseMapper restaurantResponseMapper;
 
     MockMvc mockMvc;
 
@@ -35,7 +44,8 @@ class RestaurantControllerAdapterTest {
     void setUp() {
         restaurantServicePort = mock(IRestaurantServicePort.class);
         restaurantRequestMapper = mock(IRestaurantRequestMapper.class);
-        restaurantControllerAdapter = new RestaurantControllerAdapter(restaurantServicePort, restaurantRequestMapper);
+        restaurantResponseMapper = mock(IRestaurantResponseMapper.class);
+        restaurantControllerAdapter = new RestaurantControllerAdapter(restaurantServicePort, restaurantRequestMapper, restaurantResponseMapper);
 
         mockMvc = MockMvcBuilders.standaloneSetup(restaurantControllerAdapter).build();
     }
@@ -66,6 +76,28 @@ class RestaurantControllerAdapterTest {
 
         verify(restaurantRequestMapper, times(1)).addRestaurantRequestToRestaurant(any(AddRestaurantRequest.class));
         verify(restaurantServicePort, times(1)).saveRestaurant(any());
+    }
 
+    @Test
+    void listRestaurants() throws Exception {
+
+        RestaurantResponse response = new RestaurantResponse("Corrientazo", "por ahí", "123456789", "https://picsum.photos/200");
+        List<Restaurant> restaurants = List.of(DomainTestData.getValidRestaurant(1L, 1L));
+
+        when(restaurantServicePort.getAllRestaurants()).thenReturn(restaurants);
+        when(restaurantResponseMapper.restaurantsToRestaurantResponses(anyList())).thenReturn(List.of(response));
+
+        MockHttpServletRequestBuilder request = get("/restaurants/list");
+
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Corrientazo"))
+                .andExpect(jsonPath("$[0].address").value("por ahí"))
+                .andExpect(jsonPath("$[0].phoneNumber").value("123456789"))
+                .andExpect(jsonPath("$[0].logoUrl").value("https://picsum.photos/200"));
+
+        verify(restaurantServicePort, times(1)).getAllRestaurants();
+        verify(restaurantResponseMapper, times(1)).restaurantsToRestaurantResponses(anyList());
     }
 }

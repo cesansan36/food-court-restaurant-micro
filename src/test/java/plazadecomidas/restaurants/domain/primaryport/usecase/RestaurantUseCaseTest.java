@@ -10,6 +10,8 @@ import plazadecomidas.restaurants.domain.exception.FieldRuleInvalidException;
 import plazadecomidas.restaurants.domain.model.Restaurant;
 import plazadecomidas.restaurants.domain.secondaryport.IRestaurantPersistencePort;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -73,5 +75,17 @@ class RestaurantUseCaseTest {
         assertThrows(FieldRuleInvalidException.class, () -> restaurantUseCase.saveRestaurant(restaurant));
         verify(userFeignClient, times(1)).verifyRole(anyLong(), anyString());
         verify(restaurantPersistencePort, times(0)).saveRestaurant(any(Restaurant.class));
+    }
+
+    @Test
+    @DisplayName("Get list of restaurants")
+    void getAllRestaurants() {
+        List<Restaurant> restaurants = List.of(DomainTestData.getValidRestaurant(1L, 1L));
+        when(restaurantPersistencePort.getAllRestaurants()).thenReturn(restaurants);
+
+        List<Restaurant> result = restaurantUseCase.getAllRestaurants();
+
+        assertEquals(restaurants, result);
+        verify(restaurantPersistencePort, times(1)).getAllRestaurants();
     }
 }
