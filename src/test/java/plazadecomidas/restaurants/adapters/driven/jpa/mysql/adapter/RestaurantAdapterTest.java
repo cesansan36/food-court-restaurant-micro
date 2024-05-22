@@ -7,6 +7,7 @@ import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.TestData.PersistenceTestData;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.RestaurantEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryAlreadyExistsException;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IRestaurantEntityMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IRestaurantRepository;
 import plazadecomidas.restaurants.domain.model.Restaurant;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -71,5 +73,27 @@ class RestaurantAdapterTest {
                 () -> verify(restaurantEntityMapper, times(0)).toEntity(any(Restaurant.class)),
                 () -> verify(restaurantRepository, times(0)).save(any(RestaurantEntity.class))
         );
+    }
+
+    @Test
+    @DisplayName("restaurant owner pair found")
+    void existsRestaurantOwnerPair() {
+        RestaurantEntity restaurantEntity = mock(RestaurantEntity.class);
+
+        when(restaurantRepository.findByIdAndOwnerId(anyLong(), anyLong())).thenReturn(Optional.of(restaurantEntity));
+
+        restaurantAdapter.existsRestaurantOwnerPair(1L, 1L);
+
+        verify(restaurantRepository, times(1)).findByIdAndOwnerId(anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("restaurant owner pair not found")
+    void existsRestaurantOwnerPairFail() {
+        when(restaurantRepository.findByIdAndOwnerId(anyLong(), anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(RegistryNotFoundException.class, () -> restaurantAdapter.existsRestaurantOwnerPair(1L, 1L));
+
+        verify(restaurantRepository, times(1)).findByIdAndOwnerId(anyLong(), anyLong());
     }
 }

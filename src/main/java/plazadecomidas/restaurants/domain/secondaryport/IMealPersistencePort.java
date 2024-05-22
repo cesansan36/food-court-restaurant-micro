@@ -9,4 +9,6 @@ public interface IMealPersistencePort {
     Meal getByName(String name);
 
     void updateMeal(Meal meal);
+
+    Meal getByNameAndRestaurantId(String name, Long id);
 }

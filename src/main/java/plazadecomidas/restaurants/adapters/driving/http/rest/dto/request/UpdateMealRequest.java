@@ -11,4 +11,5 @@ public class UpdateMealRequest {
     private String name;
     private String description;
     private Long price;
+    private Long restaurantId;
 }

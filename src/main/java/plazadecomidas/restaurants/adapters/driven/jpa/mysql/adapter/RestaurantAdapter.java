@@ -3,6 +3,7 @@ package plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter;
 import lombok.RequiredArgsConstructor;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.RestaurantEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryAlreadyExistsException;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IRestaurantEntityMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IRestaurantRepository;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.util.PersistenceConstants;
@@ -26,5 +27,18 @@ public class RestaurantAdapter implements IRestaurantPersistencePort {
         }
 
         restaurantRepository.save(restaurantEntityMapper.toEntity(restaurant));
+    }
+
+    @Override
+    public boolean existsRestaurantOwnerPair(Long idRestaurant, Long idOwner) {
+
+
+        Optional<RestaurantEntity> restaurant = restaurantRepository.findByIdAndOwnerId(idRestaurant, idOwner);
+
+        if (restaurant.isEmpty()) {
+            throw new RegistryNotFoundException(PersistenceConstants.RESTAURANT_OWNER_MATCH_NOT_FOUND);
+        }
+
+        return true;
     }
 }

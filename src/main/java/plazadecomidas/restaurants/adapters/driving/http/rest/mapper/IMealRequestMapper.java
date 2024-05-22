@@ -22,7 +22,7 @@ public interface IMealRequestMapper {
     @Mapping(target = "imageUrl", constant = "Dummy")
     @Mapping(target = "isActive", constant = "true")
     @Mapping(target = "category", constant = "0" , qualifiedByName = "mapCategory")
-    @Mapping(target = "restaurant", constant = "0", qualifiedByName = "mapRestaurant")
+    @Mapping(target = "restaurant", source = "restaurantId", qualifiedByName = "mapRestaurant")
     Meal updateMealRequestToMeal(UpdateMealRequest updateMealRequest);
 
     @Named("mapCategory")

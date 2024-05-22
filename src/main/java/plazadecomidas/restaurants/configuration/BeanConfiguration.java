@@ -43,7 +43,7 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public IMealServicePort mealServicePort() {
-        return new MealUseCase(mealPersistencePort());
+    public IMealServicePort mealServicePort(IMealPersistencePort mealPersistencePort, IRestaurantPersistencePort restaurantPersistencePort) {
+        return new MealUseCase(mealPersistencePort, restaurantPersistencePort);
     }
 }

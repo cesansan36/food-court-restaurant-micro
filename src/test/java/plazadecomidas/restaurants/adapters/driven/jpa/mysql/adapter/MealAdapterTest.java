@@ -18,6 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -44,12 +45,12 @@ class MealAdapterTest {
         MealEntity mealEntity = mock(MealEntity.class);
         Meal meal = DomainTestData.getValidMeal(1L);
 
-        when(mealRepository.findByName(anyString())).thenReturn(Optional.empty());
+        when(mealRepository.findByNameAndRestaurant_Id(anyString(), anyLong())).thenReturn(Optional.empty());
         when(mealEntityMapper.toEntity(any(Meal.class))).thenReturn(mealEntity);
 
         mealAdapter.saveMeal(meal);
 
-        verify(mealRepository, times(1)).findByName(anyString());
+        verify(mealRepository, times(1)).findByNameAndRestaurant_Id(anyString(), anyLong());
         verify(mealEntityMapper, times(1)).toEntity(any(Meal.class));
         verify(mealRepository, times(1)).save(any(MealEntity.class));
     }
@@ -60,11 +61,11 @@ class MealAdapterTest {
         MealEntity mealEntity = mock(MealEntity.class);
         Meal meal = DomainTestData.getValidMeal(1L);
 
-        when(mealRepository.findByName(anyString())).thenReturn(Optional.of(mealEntity));
+        when(mealRepository.findByNameAndRestaurant_Id(anyString(), anyLong())).thenReturn(Optional.of(mealEntity));
 
         assertThrows(RegistryAlreadyExistsException.class, () -> mealAdapter.saveMeal(meal));
 
-        verify(mealRepository, times(1)).findByName(anyString());
+        verify(mealRepository, times(1)).findByNameAndRestaurant_Id(anyString(), anyLong());
         verify(mealEntityMapper, times(0)).toEntity(any(Meal.class));
         verify(mealRepository, times(0)).save(any(MealEntity.class));
 
@@ -105,12 +106,12 @@ class MealAdapterTest {
         Meal meal = DomainTestData.getValidMeal(1L);
         MealEntity mealEntity = PersistenceTestData.getValidMealEntity(1L);
 
-        when(mealRepository.findByName(anyString())).thenReturn(Optional.of(mealEntity));
+        when(mealRepository.findByNameAndRestaurant_Id(anyString(), anyLong())).thenReturn(Optional.of(mealEntity));
         when(mealEntityMapper.toEntity(any(Meal.class))).thenReturn(mealEntity);
 
         mealAdapter.updateMeal(meal);
 
-        verify(mealRepository, times(1)).findByName(anyString());
+        verify(mealRepository, times(1)).findByNameAndRestaurant_Id(anyString(), anyLong());
         verify(mealEntityMapper, times(1)).toEntity(any(Meal.class));
         verify(mealRepository, times(1)).save(any(MealEntity.class));
     }
@@ -120,12 +121,42 @@ class MealAdapterTest {
     void failUpdateBecauseNotFound() {
         Meal meal = DomainTestData.getValidMeal(1L);
 
-        when(mealRepository.findByName(anyString())).thenReturn(Optional.empty());
+        when(mealRepository.findByNameAndRestaurant_Id(anyString(), anyLong())).thenReturn(Optional.empty());
 
         assertThrows(RegistryNotFoundException.class, () -> mealAdapter.updateMeal(meal));
 
-        verify(mealRepository, times(1)).findByName(anyString());
+        verify(mealRepository, times(1)).findByNameAndRestaurant_Id(anyString(), anyLong());
         verify(mealEntityMapper, times(0)).toEntity(any(Meal.class));
         verify(mealRepository, times(0)).save(any(MealEntity.class));
+    }
+
+    @Test
+    @DisplayName("Get by name and restaurant id successful")
+    void getByNameAndRestaurantId() {
+        MealEntity mealEntity = PersistenceTestData.getValidMealEntity(1L);
+        Meal meal = DomainTestData.getValidMeal(1L);
+
+        when(mealRepository.findByNameAndRestaurant_Id(anyString(), anyLong())).thenReturn(Optional.of(mealEntity));
+        when(mealEntityMapper.toDomain(any(MealEntity.class))).thenReturn(meal);
+
+        Meal foundMeal = mealAdapter.getByNameAndRestaurantId("name1", 1L);
+
+        assertAll(
+            () -> verify(mealRepository, times(1)).findByNameAndRestaurant_Id(anyString(), anyLong()),
+            () -> verify(mealEntityMapper, times(1)).toDomain(any(MealEntity.class)),
+            () -> assertEquals(meal.getName(), foundMeal.getName()),
+            () -> assertEquals(meal.getDescription(), foundMeal.getDescription()),
+            () -> assertEquals(meal.getPrice(), foundMeal.getPrice()),
+            () -> assertEquals(meal.getImageUrl(), foundMeal.getImageUrl()),
+            () -> assertEquals(meal.isActive(), foundMeal.isActive())
+        );
+    }
+
+    @Test
+    @DisplayName("Fail get by name and restaurant id because not found")
+    void failGetByNameAndRestaurantIdBecauseNotFound() {
+        when(mealRepository.findByNameAndRestaurant_Id(anyString(), anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(RegistryNotFoundException.class, () -> mealAdapter.getByNameAndRestaurantId("name1", 1L));
     }
 }

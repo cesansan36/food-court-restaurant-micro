@@ -21,7 +21,8 @@ public class MealAdapter implements IMealPersistencePort {
     @Override
     public void saveMeal(Meal meal) {
 
-        mealRepository.findByName(meal.getName()).ifPresent(mealEntity -> {
+        mealRepository.findByNameAndRestaurant_Id(meal.getName(), meal.getRestaurant().getId())
+                .ifPresent(mealEntity -> {
             throw new RegistryAlreadyExistsException(PersistenceConstants.MEAL_ALREADY_EXISTS_MESSAGE);
         });
 
@@ -40,8 +41,16 @@ public class MealAdapter implements IMealPersistencePort {
     }
 
     @Override
+    public Meal getByNameAndRestaurantId(String name, Long id) {
+        return mealEntityMapper.toDomain(
+                mealRepository.findByNameAndRestaurant_Id(name, id).orElseThrow(
+                        () -> new RegistryNotFoundException(
+                                PersistenceConstants.MEAL_NOT_FOUND_MESSAGE)));
+    }
+
+    @Override
     public void updateMeal(Meal meal) {
-        Optional<MealEntity> foundMeal = mealRepository.findByName(meal.getName());
+        Optional<MealEntity> foundMeal = mealRepository.findByNameAndRestaurant_Id(meal.getName(), meal.getRestaurant().getId());
 
         if (foundMeal.isEmpty()) {
             throw new RegistryNotFoundException(PersistenceConstants.MEAL_NOT_FOUND_MESSAGE);

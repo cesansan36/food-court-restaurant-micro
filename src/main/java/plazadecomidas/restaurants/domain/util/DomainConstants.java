@@ -33,4 +33,5 @@ public class DomainConstants {
     public static final String OWNER_ID_INVALID_MESSAGE = "The Id of the user doesn't have the required role";
     public static final String USER_ID_NOT_FOUND = "Could not find the user - Response obtained was -> %s";
     public static final String PRICE_NOT_VALID = "The price must be a whole number greater than 0";
+    public static final String RESTAURANT_OWNER_MISMATCH_MESSAGE = "The restaurant doesn't belong to the user";
 }
