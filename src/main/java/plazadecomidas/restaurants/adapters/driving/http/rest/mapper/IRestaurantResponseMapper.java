@@ -9,7 +9,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface IRestaurantResponseMapper {
 
-    public RestaurantResponse restaurantToRestaurantResponse(Restaurant restaurant);
+    RestaurantResponse restaurantToRestaurantResponse(Restaurant restaurant);
 
-    public List<RestaurantResponse> restaurantsToRestaurantResponses(List<Restaurant> restaurants);
+    List<RestaurantResponse> restaurantsToRestaurantResponses(List<Restaurant> restaurants);
 }
