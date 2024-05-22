@@ -12,12 +12,14 @@ import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IMealEntityMa
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IMealRepository;
 import plazadecomidas.restaurants.domain.model.Meal;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -158,5 +160,29 @@ class MealAdapterTest {
         when(mealRepository.findByNameAndRestaurant_Id(anyString(), anyLong())).thenReturn(Optional.empty());
 
         assertThrows(RegistryNotFoundException.class, () -> mealAdapter.getByNameAndRestaurantId("name1", 1L));
+    }
+
+    @Test
+    @DisplayName("Get meals of restaurant")
+    void getMealsOfRestaurant() {
+
+        Meal meal = DomainTestData.getValidMeal(1L);
+        MealEntity mealEntity = PersistenceTestData.getValidMealEntity(1L);
+
+        when(mealRepository.findByActiveTrueAndRestaurantId(anyLong())).thenReturn(List.of(mealEntity));
+        when(mealEntityMapper.toDomainList(anyList())).thenReturn(List.of(meal));
+
+        List<Meal> foundMeals = mealAdapter.getMealsOfRestaurant(1L);
+
+        assertAll(
+            () -> verify(mealRepository, times(1)).findByActiveTrueAndRestaurantId(anyLong()),
+            () -> verify(mealEntityMapper, times(1)).toDomainList(anyList()),
+            () -> assertEquals(meal.getName(), foundMeals.getFirst().getName()),
+            () -> assertEquals(meal.getDescription(), foundMeals.getFirst().getDescription()),
+            () -> assertEquals(meal.getPrice(), foundMeals.getFirst().getPrice()),
+            () -> assertEquals(meal.getImageUrl(), foundMeals.getFirst().getImageUrl()),
+            () -> assertEquals(meal.isActive(), foundMeals.getFirst().isActive())
+        );
+
     }
 }

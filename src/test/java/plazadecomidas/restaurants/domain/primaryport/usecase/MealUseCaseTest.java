@@ -9,6 +9,8 @@ import plazadecomidas.restaurants.domain.model.Meal;
 import plazadecomidas.restaurants.domain.secondaryport.IMealPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IRestaurantPersistencePort;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -90,5 +92,18 @@ class MealUseCaseTest {
 
         verify(mealPersistencePort, times(1)).getByNameAndRestaurantId(anyString(), anyLong());
         verify(mealPersistencePort, times(1)).updateMeal(any(Meal.class));
+    }
+
+    @Test
+    @DisplayName("Get meals of restaurant")
+    void getMealsOfRestaurant() {
+        Long idRestaurant = 1L;
+        Meal meal = DomainTestData.getValidMeal(1L);
+
+        when(mealPersistencePort.getMealsOfRestaurant(anyLong())).thenReturn(List.of(meal));
+
+        mealUseCase.getMealsOfRestaurant(idRestaurant);
+
+        verify(mealPersistencePort, times(1)).getMealsOfRestaurant(anyLong());
     }
 }

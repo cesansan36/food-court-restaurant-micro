@@ -15,12 +15,18 @@ import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddMealRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateMealAvailabilityRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateMealRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.response.MealResponse;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IMealRequestMapper;
+import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IMealResponseMapper;
+import plazadecomidas.restaurants.domain.model.Category;
 import plazadecomidas.restaurants.domain.model.Meal;
 import plazadecomidas.restaurants.domain.primaryport.IMealServicePort;
 import plazadecomidas.restaurants.util.ITokenUtils;
 
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -28,8 +34,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class MealControllerAdapterTest {
@@ -38,6 +46,7 @@ class MealControllerAdapterTest {
 
     private IMealServicePort mealServicePort;
     private IMealRequestMapper mealRequestMapper;
+    private IMealResponseMapper mealResponseMapper;
     private ITokenUtils tokenUtils;
 
     MockMvc mockMvc;
@@ -46,9 +55,10 @@ class MealControllerAdapterTest {
     void setUp() {
         mealServicePort = mock(IMealServicePort.class);
         mealRequestMapper = mock(IMealRequestMapper.class);
+        mealResponseMapper = mock(IMealResponseMapper.class);
         tokenUtils = mock(ITokenUtils.class);
 
-        mealControllerAdapter = new MealControllerAdapter(mealServicePort, mealRequestMapper, tokenUtils);
+        mealControllerAdapter = new MealControllerAdapter(mealServicePort, mealRequestMapper, mealResponseMapper, tokenUtils);
 
         mockMvc = MockMvcBuilders.standaloneSetup(mealControllerAdapter).build();
     }
@@ -157,5 +167,29 @@ class MealControllerAdapterTest {
         verify(mealServicePort, times(1)).updateMealAvailability(any(Meal.class), anyLong());
         verify(tokenUtils, times(1)).validateToken(anyString());
         verify(tokenUtils, times(1)).getSpecificClaim(any(DecodedJWT.class), any(String.class));
+    }
+
+    @Test
+    void getAllActiveMealsFromRestaurant() throws Exception {
+
+        Long restaurantId = 1L;
+        Meal meal = DomainTestData.getValidMeal(1L);
+        MealResponse response = new MealResponse(1L, "Chocolate", "Delicious", 123456L, "https://picsum.photos/200", new Category(1L, "Desayuno", "Delicious"));
+
+        when(mealServicePort.getMealsOfRestaurant(anyLong())).thenReturn(List.of(meal));
+        when(mealResponseMapper.mealsToMealResponses(anyList())).thenReturn(List.of(response));
+
+
+        MockHttpServletRequestBuilder request = get("/meals/list")
+                .param("restaurantId", String.valueOf(restaurantId));
+
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("Chocolate"))
+                .andExpect(jsonPath("$[0].description").value("Delicious"))
+                .andExpect(jsonPath("$[0].price").value(123456L))
+                .andExpect(jsonPath("$[0].imageUrl").value("https://picsum.photos/200"));
     }
 }
