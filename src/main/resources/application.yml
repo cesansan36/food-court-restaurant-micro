@@ -9,3 +9,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+application:
+  security:
+    jwt:
+      secret: ${secret}
+      expiration: 604800000
+      user-generator: ${user_generator}

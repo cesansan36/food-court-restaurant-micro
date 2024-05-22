@@ -3,6 +3,7 @@ package plazadecomidas.restaurants.adapters.driving.http.rest.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,7 @@ public class MealControllerAdapter {
     private final IMealRequestMapper mealRequestMapper;
 
     @PostMapping("register")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<Void> addMeal(@RequestBody AddMealRequest addMealRequest) {
         Meal meal = mealRequestMapper.addMealRequestToMeal(addMealRequest);
         mealServicePort.saveMeal(meal);
@@ -30,6 +32,7 @@ public class MealControllerAdapter {
     }
 
     @PutMapping("update")
+    @PreAuthorize("hasRole('OWNER')")
     public ResponseEntity<Void> updateMeal(@RequestBody UpdateMealRequest updateMealRequest) {
         Meal meal = mealRequestMapper.updateMealRequestToMeal(updateMealRequest);
 

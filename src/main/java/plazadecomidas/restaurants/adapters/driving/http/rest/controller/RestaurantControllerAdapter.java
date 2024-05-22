@@ -3,6 +3,7 @@ package plazadecomidas.restaurants.adapters.driving.http.rest.controller;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +21,7 @@ public class RestaurantControllerAdapter {
     private final IRestaurantRequestMapper restaurantRequestMapper;
 
     @PostMapping("register/restaurant")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> addRestaurant(@RequestBody AddRestaurantRequest addRestaurantRequest) {
 
         restaurantServicePort.saveRestaurant(
