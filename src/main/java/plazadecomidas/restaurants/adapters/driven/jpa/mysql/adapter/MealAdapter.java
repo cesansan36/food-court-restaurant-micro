@@ -10,6 +10,7 @@ import plazadecomidas.restaurants.adapters.driven.jpa.mysql.util.PersistenceCons
 import plazadecomidas.restaurants.domain.model.Meal;
 import plazadecomidas.restaurants.domain.secondaryport.IMealPersistencePort;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -46,6 +47,11 @@ public class MealAdapter implements IMealPersistencePort {
                 mealRepository.findByNameAndRestaurant_Id(name, id).orElseThrow(
                         () -> new RegistryNotFoundException(
                                 PersistenceConstants.MEAL_NOT_FOUND_MESSAGE)));
+    }
+
+    @Override
+    public List<Meal> getMealsOfRestaurant(Long restaurantId) {
+        return mealEntityMapper.toDomainList(mealRepository.findByActiveTrueAndRestaurantId(restaurantId));
     }
 
     @Override

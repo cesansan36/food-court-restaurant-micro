@@ -81,7 +81,7 @@ class RestaurantControllerAdapterTest {
     @Test
     void listRestaurants() throws Exception {
 
-        RestaurantResponse response = new RestaurantResponse("Corrientazo", "por ahí", "123456789", "https://picsum.photos/200");
+        RestaurantResponse response = new RestaurantResponse(1L, "Corrientazo", "por ahí", "123456789", "https://picsum.photos/200");
         List<Restaurant> restaurants = List.of(DomainTestData.getValidRestaurant(1L, 1L));
 
         when(restaurantServicePort.getAllRestaurants()).thenReturn(restaurants);
@@ -92,6 +92,7 @@ class RestaurantControllerAdapterTest {
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].name").value("Corrientazo"))
                 .andExpect(jsonPath("$[0].address").value("por ahí"))
                 .andExpect(jsonPath("$[0].phoneNumber").value("123456789"))

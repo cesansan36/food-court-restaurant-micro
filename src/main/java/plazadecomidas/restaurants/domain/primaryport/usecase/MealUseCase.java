@@ -7,6 +7,8 @@ import plazadecomidas.restaurants.domain.secondaryport.IMealPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IRestaurantPersistencePort;
 import plazadecomidas.restaurants.domain.util.DomainConstants;
 
+import java.util.List;
+
 public class MealUseCase implements IMealServicePort {
 
     private final IMealPersistencePort mealPersistencePort;
@@ -60,6 +62,11 @@ public class MealUseCase implements IMealServicePort {
                 previousMeal.getCategory());
 
         mealPersistencePort.updateMeal(updatedValuesMeal);
+    }
+
+    @Override
+    public List<Meal> getMealsOfRestaurant(Long restaurantId) {
+        return mealPersistencePort.getMealsOfRestaurant(restaurantId);
     }
 
     void throwIfRestaurantOwnerPairNotExists (Long idRestaurant, Long idOwner) {

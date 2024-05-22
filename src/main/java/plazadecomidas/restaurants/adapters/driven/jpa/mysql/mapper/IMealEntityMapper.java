@@ -5,6 +5,8 @@ import org.mapstruct.Mapping;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.MealEntity;
 import plazadecomidas.restaurants.domain.model.Meal;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface IMealEntityMapper {
 
@@ -12,4 +14,6 @@ public interface IMealEntityMapper {
 
     @Mapping(target = "isActive", source = "active")
     Meal toDomain(MealEntity mealEntity);
+
+    List<Meal> toDomainList(List<MealEntity> mealEntityList);
 }

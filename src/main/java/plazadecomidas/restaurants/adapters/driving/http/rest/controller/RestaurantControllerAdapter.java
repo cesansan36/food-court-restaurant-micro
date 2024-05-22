@@ -36,6 +36,7 @@ public class RestaurantControllerAdapter {
     }
 
     @GetMapping("list")
+    @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<List<RestaurantResponse>> listRestaurants() {
 
         List<RestaurantResponse> restaurants = restaurantResponseMapper.restaurantsToRestaurantResponses(
