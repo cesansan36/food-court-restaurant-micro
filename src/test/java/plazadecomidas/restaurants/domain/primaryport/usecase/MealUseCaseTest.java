@@ -75,4 +75,20 @@ class MealUseCaseTest {
         verify(mealPersistencePort, times(0)).saveMeal(any(Meal.class));
         verify(restaurantPersistencePort, times(1)).existsRestaurantOwnerPair(anyLong(), anyLong());
     }
+
+    @Test
+    @DisplayName("Update meal availability successful")
+    void updateMealAvailability() {
+        Meal meal = DomainTestData.getValidMeal(1L);
+        Long userId = 1L;
+        Meal previousMeal = DomainTestData.getValidMeal(2L);
+
+        when(restaurantPersistencePort.existsRestaurantOwnerPair(anyLong(), anyLong())).thenReturn(true);
+        when(mealPersistencePort.getByNameAndRestaurantId(anyString(), anyLong())).thenReturn(previousMeal);
+
+        mealUseCase.updateMealAvailability(meal, userId);
+
+        verify(mealPersistencePort, times(1)).getByNameAndRestaurantId(anyString(), anyLong());
+        verify(mealPersistencePort, times(1)).updateMeal(any(Meal.class));
+    }
 }

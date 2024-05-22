@@ -43,6 +43,25 @@ public class MealUseCase implements IMealServicePort {
         mealPersistencePort.updateMeal(updatedValuesMeal);
     }
 
+    @Override
+    public void updateMealAvailability(Meal meal, Long userId) {
+        throwIfRestaurantOwnerPairNotExists(meal.getRestaurant().getId(), userId);
+
+        Meal previousMeal = mealPersistencePort.getByNameAndRestaurantId(meal.getName(), meal.getRestaurant().getId());
+
+        Meal updatedValuesMeal = new Meal(
+                previousMeal.getId(),
+                previousMeal.getName(),
+                previousMeal.getDescription(),
+                previousMeal.getPrice(),
+                previousMeal.getImageUrl(),
+                meal.isActive(),
+                previousMeal.getRestaurant(),
+                previousMeal.getCategory());
+
+        mealPersistencePort.updateMeal(updatedValuesMeal);
+    }
+
     void throwIfRestaurantOwnerPairNotExists (Long idRestaurant, Long idOwner) {
         boolean isRestaurantOwnerValid = restaurantPersistencePort.existsRestaurantOwnerPair(idRestaurant, idOwner);
 

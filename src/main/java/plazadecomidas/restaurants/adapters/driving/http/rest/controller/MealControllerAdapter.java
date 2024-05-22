@@ -50,12 +50,12 @@ public class MealControllerAdapter {
 
     @PutMapping("set-availability")
     @PreAuthorize("hasRole('OWNER')")
-    public ResponseEntity<Void> setAvailability(@RequestHeader("Authorization") String token, @RequestBody UpdateMealAvailabilityRequest updateMealRequest) {
-
+    public ResponseEntity<Void> setAvailability(@RequestHeader("Authorization") String token,
+                                                @RequestBody UpdateMealAvailabilityRequest updateMealRequest) {
         Long userId = getUserId(token);
+        Meal meal = mealRequestMapper.updateMealAvailabilityRequestToMeal(updateMealRequest);
 
-        //TODO : This had to be put on hold because error in previous us was detected
-
+        mealServicePort.updateMealAvailability(meal, userId);
         return ResponseEntity.ok().build();
     }
 

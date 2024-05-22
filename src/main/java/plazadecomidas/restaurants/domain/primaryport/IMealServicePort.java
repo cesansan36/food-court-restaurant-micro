@@ -7,4 +7,6 @@ public interface IMealServicePort {
     void saveMeal(Meal meal, Long userId);
 
     void updateMeal(Meal meal, Long userId);
+
+    void updateMealAvailability(Meal meal, Long userId);
 }

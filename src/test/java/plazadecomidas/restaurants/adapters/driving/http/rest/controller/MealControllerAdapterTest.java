@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import plazadecomidas.restaurants.TestData.ControllerTestData;
 import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddMealRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateMealAvailabilityRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateMealRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IMealRequestMapper;
 import plazadecomidas.restaurants.domain.model.Meal;
@@ -120,6 +121,40 @@ class MealControllerAdapterTest {
 
         verify(mealRequestMapper, times(1)).updateMealRequestToMeal(any(UpdateMealRequest.class));
         verify(mealServicePort, times(1)).updateMeal(any(Meal.class), anyLong());
+        verify(tokenUtils, times(1)).validateToken(anyString());
+        verify(tokenUtils, times(1)).getSpecificClaim(any(DecodedJWT.class), any(String.class));
+    }
+
+    @Test
+    void updateMealAvailability() throws Exception {
+        Object inputObject = new Object() {
+            public final String name = "Chocolate";
+            public final Boolean availability = true;
+            public final Long restaurantId = 1L;
+        };
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String inputJson = objectMapper.writeValueAsString(inputObject);
+
+        Meal meal = DomainTestData.getValidMeal(1L);
+        Claim claim = ControllerTestData.getIdClaim(1L);
+        String bearerToken = "Bearer 123456789";
+
+        when(mealRequestMapper.updateMealAvailabilityRequestToMeal(any(UpdateMealAvailabilityRequest.class))).thenReturn(meal);
+        when(tokenUtils.validateToken(anyString())).thenReturn(mock(DecodedJWT.class));
+        when(tokenUtils.getSpecificClaim(any(DecodedJWT.class), any(String.class))).thenReturn(claim);
+
+        MockHttpServletRequestBuilder request = put("/meals/set-availability")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, bearerToken)
+                .content(inputJson);
+
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        verify(mealRequestMapper, times(1)).updateMealAvailabilityRequestToMeal(any(UpdateMealAvailabilityRequest.class));
+        verify(mealServicePort, times(1)).updateMealAvailability(any(Meal.class), anyLong());
         verify(tokenUtils, times(1)).validateToken(anyString());
         verify(tokenUtils, times(1)).getSpecificClaim(any(DecodedJWT.class), any(String.class));
     }
