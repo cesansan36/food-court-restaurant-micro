@@ -8,6 +8,8 @@ import plazadecomidas.restaurants.domain.primaryport.IRestaurantServicePort;
 import plazadecomidas.restaurants.domain.secondaryport.IRestaurantPersistencePort;
 import plazadecomidas.restaurants.domain.util.DomainConstants;
 
+import java.util.List;
+
 public class RestaurantUseCase implements IRestaurantServicePort {
 
     private final IRestaurantPersistencePort restaurantPersistencePort;
@@ -34,5 +36,10 @@ public class RestaurantUseCase implements IRestaurantServicePort {
         }
 
         restaurantPersistencePort.saveRestaurant(restaurant);
+    }
+
+    @Override
+    public List<Restaurant> getAllRestaurants() {
+        return restaurantPersistencePort.getAllRestaurants();
     }
 }

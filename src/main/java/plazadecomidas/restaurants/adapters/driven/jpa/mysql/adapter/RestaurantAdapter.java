@@ -10,6 +10,7 @@ import plazadecomidas.restaurants.adapters.driven.jpa.mysql.util.PersistenceCons
 import plazadecomidas.restaurants.domain.model.Restaurant;
 import plazadecomidas.restaurants.domain.secondaryport.IRestaurantPersistencePort;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -40,5 +41,11 @@ public class RestaurantAdapter implements IRestaurantPersistencePort {
         }
 
         return true;
+    }
+
+    @Override
+    public List<Restaurant> getAllRestaurants() {
+        List<RestaurantEntity> restaurants = restaurantRepository.findAll();
+        return restaurantEntityMapper.toDomainList(restaurants);
     }
 }
