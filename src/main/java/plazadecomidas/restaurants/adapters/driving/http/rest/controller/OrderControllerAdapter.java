@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddOrderRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderRequestMapper;
 import plazadecomidas.restaurants.adapters.driving.http.rest.util.ControllerConstants;
-import plazadecomidas.restaurants.domain.model.Order;
 import plazadecomidas.restaurants.domain.primaryport.IOrderServicePort;
 import plazadecomidas.restaurants.util.ITokenUtils;
 

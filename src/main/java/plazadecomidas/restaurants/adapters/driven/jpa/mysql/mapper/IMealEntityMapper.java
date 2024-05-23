@@ -10,7 +10,10 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface IMealEntityMapper {
 
+    @Mapping(target = "orders", ignore = true)
     MealEntity toEntity(Meal meal);
+
+    List<MealEntity> toEntityList(List<Meal> mealList);
 
     @Mapping(target = "isActive", source = "active")
     Meal toDomain(MealEntity mealEntity);
