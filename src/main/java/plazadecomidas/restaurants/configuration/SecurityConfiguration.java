@@ -26,6 +26,7 @@ public class SecurityConfiguration {
     private static final String[] AUTH_WHITELIST = {
         "/restaurants/**",
         "/meals/**",
+        "/orders/**",
         "/v2/api-docs",
         "/v2/api-docs/**",
         "/v3/api-docs",

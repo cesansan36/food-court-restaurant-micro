@@ -23,6 +23,13 @@ public class DomainConstants {
         RESTAURANT,
         CATEGORY
     }
+    public enum OrderStatus {
+        PENDING,
+        PREPARING,
+        READY,
+        DELIVERED,
+        CANCELED
+    }
 
     public static final String OWNER_ROLE = "ROLE_OWNER";
 

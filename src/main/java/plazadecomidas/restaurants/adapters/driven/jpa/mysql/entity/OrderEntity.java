@@ -15,34 +15,35 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "meal")
+@Table(name = "orders")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class MealEntity {
+public class OrderEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String description;
-    private Long price;
-    @Column(name = "image_url")
-    private String imageUrl;
-    @Column(name = "is_active")
-    private boolean active;
+
+    @Column(name = "id_client")
+    private Long idClient;
+
+    private LocalDate date;
+    private String status;
+
+    @Column(name = "id_chef")
+    private Long idChef;
+
     @ManyToOne
     @JoinColumn(name = "id_restaurant")
     private RestaurantEntity restaurant;
-    @ManyToOne
-    @JoinColumn(name = "id_category")
-    private CategoryEntity category;
 
-    @OneToMany(mappedBy = "meal")
-    private List<OrderMealEntity> orders = new ArrayList<>();
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderMealEntity> meals = new ArrayList<>();
 }

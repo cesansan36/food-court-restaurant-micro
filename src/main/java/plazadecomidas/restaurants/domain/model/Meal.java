@@ -96,4 +96,18 @@ public class Meal {
     public Category getCategory() {
         return category;
     }
+
+    @Override
+    public String toString() {
+        return "Meal{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", price=" + price +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", isActive=" + isActive +
+                ", restaurant=" + restaurant +
+                ", category=" + category +
+                '}';
+    }
 }
