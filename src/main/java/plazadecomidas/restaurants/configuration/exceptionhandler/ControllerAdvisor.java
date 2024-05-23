@@ -5,7 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryAlreadyExistsException;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryMismatchException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
+import plazadecomidas.restaurants.domain.exception.ClientHasUnfinishedOrdersException;
 import plazadecomidas.restaurants.domain.exception.DataMismatchException;
 import plazadecomidas.restaurants.domain.exception.EmptyFieldException;
 import plazadecomidas.restaurants.domain.exception.FieldRuleInvalidException;
@@ -41,6 +43,18 @@ public class ControllerAdvisor {
 
     @ExceptionHandler(DataMismatchException.class)
     public ResponseEntity<ExceptionResponse> handleDataMismatchException(DataMismatchException exception) {
+        return ResponseEntity.badRequest().body(new ExceptionResponse(
+                exception.getMessage(), HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(ClientHasUnfinishedOrdersException.class)
+    public ResponseEntity<ExceptionResponse> handleClientHasUnfinishedOrdersException(ClientHasUnfinishedOrdersException exception) {
+        return ResponseEntity.badRequest().body(new ExceptionResponse(
+                exception.getMessage(), HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(RegistryMismatchException.class)
+    public ResponseEntity<ExceptionResponse> handleRegistryMismatchException(RegistryMismatchException exception) {
         return ResponseEntity.badRequest().body(new ExceptionResponse(
                 exception.getMessage(), HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now()));
     }
