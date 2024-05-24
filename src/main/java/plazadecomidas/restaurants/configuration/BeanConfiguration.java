@@ -4,21 +4,27 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import plazadecomidas.restaurants.adapters.driven.feign.IUserFeignClient;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.EmployeeAdapter;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.MealAdapter;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.OrderAdapter;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.RestaurantAdapter;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IEmployeeEntityMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IMealEntityMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IOrderEntityMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IRestaurantEntityMapper;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IEmployeeRepository;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IMealRepository;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IOrderRepository;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IRestaurantRepository;
+import plazadecomidas.restaurants.domain.primaryport.IEmployeeServicePort;
 import plazadecomidas.restaurants.domain.primaryport.IMealServicePort;
 import plazadecomidas.restaurants.domain.primaryport.IOrderServicePort;
 import plazadecomidas.restaurants.domain.primaryport.IRestaurantServicePort;
+import plazadecomidas.restaurants.domain.primaryport.usecase.EmployeeUseCase;
 import plazadecomidas.restaurants.domain.primaryport.usecase.MealUseCase;
 import plazadecomidas.restaurants.domain.primaryport.usecase.OrderUseCase;
 import plazadecomidas.restaurants.domain.primaryport.usecase.RestaurantUseCase;
+import plazadecomidas.restaurants.domain.secondaryport.IEmployeePersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IMealPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IRestaurantPersistencePort;
@@ -30,9 +36,11 @@ public class BeanConfiguration {
     private final IRestaurantRepository restaurantRepository;
     private final IMealRepository mealRepository;
     private final IOrderRepository orderRepository;
+    private final IEmployeeRepository employeeRepository;
     private final IRestaurantEntityMapper restaurantEntityMapper;
     private final IMealEntityMapper mealEntityMapper;
     private final IOrderEntityMapper orderEntityMapper;
+    private final IEmployeeEntityMapper employeeEntityMapper;
     private final IUserFeignClient userFeignClient;
 
     @Bean
@@ -63,5 +71,15 @@ public class BeanConfiguration {
     @Bean
     public IOrderServicePort orderServicePort(IOrderPersistencePort orderPersistencePort) {
         return new OrderUseCase(orderPersistencePort);
+    }
+
+    @Bean
+    public IEmployeePersistencePort employeePersistencePort() {
+        return new EmployeeAdapter(employeeRepository, employeeEntityMapper);
+    }
+
+    @Bean
+    public IEmployeeServicePort employeeServicePort(IEmployeePersistencePort employeePersistencePort) {
+        return new EmployeeUseCase(employeePersistencePort);
     }
 }
