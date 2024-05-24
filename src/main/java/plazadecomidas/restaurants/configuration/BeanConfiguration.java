@@ -79,7 +79,7 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public IEmployeeServicePort employeeServicePort(IEmployeePersistencePort employeePersistencePort) {
-        return new EmployeeUseCase(employeePersistencePort);
+    public IEmployeeServicePort employeeServicePort(IEmployeePersistencePort employeePersistencePort, IRestaurantPersistencePort restaurantPersistencePort) {
+        return new EmployeeUseCase(employeePersistencePort, restaurantPersistencePort);
     }
 }

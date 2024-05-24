@@ -48,4 +48,9 @@ public class RestaurantAdapter implements IRestaurantPersistencePort {
         List<RestaurantEntity> restaurants = restaurantRepository.findAll();
         return restaurantEntityMapper.toDomainList(restaurants);
     }
+
+    @Override
+    public boolean existsOwnerRestaurantMatch(Long idOwner, Long idRestaurant) {
+        return restaurantRepository.existsByOwnerIdAndId(idOwner, idRestaurant);
+    }
 }

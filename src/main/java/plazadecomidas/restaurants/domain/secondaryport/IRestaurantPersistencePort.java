@@ -11,4 +11,6 @@ public interface IRestaurantPersistencePort {
     boolean existsRestaurantOwnerPair(Long idRestaurant, Long idOwner);
 
     List<Restaurant> getAllRestaurants();
+
+    boolean existsOwnerRestaurantMatch(Long idOwner, Long idRestaurant);
 }

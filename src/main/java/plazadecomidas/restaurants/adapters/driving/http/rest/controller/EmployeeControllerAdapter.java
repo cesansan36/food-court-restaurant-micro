@@ -31,11 +31,12 @@ public class EmployeeControllerAdapter {
         Long ownerId = getUserId(token);
 
         if (!ownerId.equals(addEmployeeRequest.idOwner())) {
-            //TODO add custom exception
             throw new IdMismatchException(ControllerConstants.OWNER_ID_MISMATCH_MESSAGE);
         }
 
-        employeeServicePort.save(employeeRequestMapper.addEmployeeRequestToEmployee(addEmployeeRequest));
+        employeeServicePort.save(
+                employeeRequestMapper.addEmployeeRequestToEmployee(
+                        addEmployeeRequest), ownerId);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
