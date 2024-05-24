@@ -14,6 +14,7 @@ import plazadecomidas.restaurants.TestData.ControllerTestData;
 import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddOrderRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderRequestMapper;
+import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderResponseMapper;
 import plazadecomidas.restaurants.domain.model.Order;
 import plazadecomidas.restaurants.domain.primaryport.IOrderServicePort;
 import plazadecomidas.restaurants.util.ITokenUtils;
@@ -37,6 +38,7 @@ class OrderControllerAdapterTest {
 
     private IOrderServicePort orderServicePort;
     private IOrderRequestMapper orderRequestMapper;
+    private IOrderResponseMapper orderResponseMapper;
     private ITokenUtils tokenUtils;
 
     private MockMvc mockMvc;
@@ -46,8 +48,9 @@ class OrderControllerAdapterTest {
 
         orderServicePort = mock(IOrderServicePort.class);
         orderRequestMapper = mock(IOrderRequestMapper.class);
+        orderResponseMapper = mock(IOrderResponseMapper.class);
         tokenUtils = mock(ITokenUtils.class);
-        orderControllerAdapter = new OrderControllerAdapter(orderServicePort, orderRequestMapper, tokenUtils);
+        orderControllerAdapter = new OrderControllerAdapter(orderServicePort, orderRequestMapper, orderResponseMapper, tokenUtils);
         mockMvc = MockMvcBuilders.standaloneSetup(orderControllerAdapter).build();
     }
 

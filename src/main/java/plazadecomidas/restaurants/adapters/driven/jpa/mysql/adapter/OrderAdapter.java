@@ -10,6 +10,7 @@ import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IOrderRep
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.util.PersistenceConstants;
 import plazadecomidas.restaurants.domain.model.Order;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderPersistencePort;
+import plazadecomidas.restaurants.domain.util.DomainConstants;
 
 import java.util.List;
 
@@ -43,5 +44,19 @@ public class OrderAdapter implements IOrderPersistencePort {
         }
 
         orderRepository.save(orderEntity);
+    }
+
+    @Override
+    public List<Order> getOrdersByStatus(Integer page, Integer size, String status) {
+        List<OrderEntity> orderEntities;
+
+        if (DomainConstants.OrderStatus.isValidStatus(status)) {
+            orderEntities = orderRepository.findAllByStatus(status);
+        }
+        else {
+            orderEntities = orderRepository.findAll();
+        }
+
+        return orderEntityMapper.orderEntitiesToOrders(orderEntities);
     }
 }

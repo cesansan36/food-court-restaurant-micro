@@ -20,8 +20,8 @@ public class MealOrder {
     }
 
     void validateData(Long idMeal, Integer quantity) {
-        if(idMeal == null) throw new EmptyFieldException(DomainConstants.MealOrderFields.ID_MEAL.name());
-        if(quantity == null) throw new EmptyFieldException(DomainConstants.MealOrderFields.QUANTITY.name());
+        if(idMeal == null) throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.MealOrderFields.ID_MEAL));
+        if(quantity == null) throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.MealOrderFields.QUANTITY));
         if(quantity <= 0) throw new FieldRuleInvalidException(DomainConstants.QUANTITY_NEGATIVE_MESSAGE);
     }
 

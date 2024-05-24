@@ -46,4 +46,26 @@ public interface IOrderEntityMapper {
         restaurantEntity.setId(idRestaurant);
         return restaurantEntity;
     }
+
+    @Mapping(target = "meals", source = "meals", qualifiedByName = "mapMealsToDomain")
+    @Mapping(target = "idRestaurant", source = "restaurant.id")
+    Order orderEntityToOrder(OrderEntity orderEntity);
+
+    @Named("mapMealsToDomain")
+    default List<MealOrder> mapMealsToDomain(List<OrderMealEntity> orderMeals) {
+        List<MealOrder> meals = new ArrayList<>();
+
+        for (OrderMealEntity orderMealEntity : orderMeals) {
+            MealOrder mealOrder = new MealOrder(
+                orderMealEntity.getMeal().getId(),
+                null,
+                orderMealEntity.getAmount()
+            );
+            meals.add(mealOrder);
+        }
+
+        return meals;
+    }
+
+    List<Order> orderEntitiesToOrders(List<OrderEntity> orderEntities);
 }

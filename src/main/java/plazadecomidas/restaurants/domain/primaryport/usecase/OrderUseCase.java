@@ -6,6 +6,8 @@ import plazadecomidas.restaurants.domain.primaryport.IOrderServicePort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderPersistencePort;
 import plazadecomidas.restaurants.domain.util.DomainConstants;
 
+import java.util.List;
+
 public class OrderUseCase implements IOrderServicePort {
 
     private final IOrderPersistencePort orderPersistencePort;
@@ -23,5 +25,10 @@ public class OrderUseCase implements IOrderServicePort {
         }
 
         orderPersistencePort.saveOrder(order);
+    }
+
+    @Override
+    public List<Order> getOrdersByStatus(Integer page, Integer size, String status) {
+        return orderPersistencePort.getOrdersByStatus(page, size, status);
     }
 }

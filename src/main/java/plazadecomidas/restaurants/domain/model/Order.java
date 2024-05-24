@@ -34,12 +34,12 @@ public class Order {
     }
 
     void validateFields(Long idClient, LocalDate date, String status, Long idRestaurant, List<MealOrder> meals) {
-        if(idClient == null) throw new EmptyFieldException(DomainConstants.OrderFields.ID_CLIENT.name());
-        if(date == null) throw new EmptyFieldException(DomainConstants.OrderFields.DATE.name());
-        if(Validator.isFieldEmpty(status)) throw new EmptyFieldException(DomainConstants.OrderFields.STATUS.name());
+        if(idClient == null) throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.OrderFields.ID_CLIENT.name()));
+        if(date == null) throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.OrderFields.DATE.name()));
+        if(Validator.isFieldEmpty(status)) throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.OrderFields.STATUS.name()));
         if(!DomainConstants.OrderStatus.isValidStatus(status)) throw new FieldRuleInvalidException(DomainConstants.WRONG_STATUS_MESSAGE);
-        if(idRestaurant == null) throw new EmptyFieldException(DomainConstants.OrderFields.ID_RESTAURANT.name());
-        if(meals == null) throw new EmptyFieldException(DomainConstants.OrderFields.MEALS.name());
+        if(idRestaurant == null) throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.OrderFields.ID_RESTAURANT.name()));
+        if(meals == null) throw new EmptyFieldException(DomainConstants.EMPTY_FIELD_MESSAGE.formatted(DomainConstants.OrderFields.MEALS.name()));
     }
 
     public Long getId() {
