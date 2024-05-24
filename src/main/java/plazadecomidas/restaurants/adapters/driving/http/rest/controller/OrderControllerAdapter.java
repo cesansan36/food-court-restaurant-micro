@@ -46,6 +46,7 @@ public class OrderControllerAdapter {
     @GetMapping("list")
     @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<List<OrderResponse>> listOrders(
+                                @RequestHeader("Authorization") String token,
                                 @RequestParam(defaultValue = "0") Integer page,
                                 @RequestParam(defaultValue = "5") Integer size,
                                 @RequestParam(defaultValue = "PENDING") String status
@@ -53,8 +54,11 @@ public class OrderControllerAdapter {
         if (page < 0) { page = 0; }
         if (size < 1) { size = 5; }
 
+        // TODO: Aclarar como se relaciona un empleado con el restaurante
+        Long userId = getUserId(token);
+
         List<OrderResponse> orders = orderResponseMapper.ordersToOrderResponses(
-                                        orderServicePort.getOrdersByStatus(page, size, status));
+                                        orderServicePort.getOrdersByStatus(userId, page, size, status));
         return ResponseEntity.ok(orders);
     }
 

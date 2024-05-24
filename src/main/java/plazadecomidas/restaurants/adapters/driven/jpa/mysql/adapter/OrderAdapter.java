@@ -1,6 +1,7 @@
 package plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.OrderEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.OrderMealEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryMismatchException;
@@ -47,14 +48,16 @@ public class OrderAdapter implements IOrderPersistencePort {
     }
 
     @Override
-    public List<Order> getOrdersByStatus(Integer page, Integer size, String status) {
+    public List<Order> getOrdersByStatus(Long UserId, Integer page, Integer size, String status) {
         List<OrderEntity> orderEntities;
 
+        Pageable pagination = Pageable.ofSize(size).withPage(page);
+
         if (DomainConstants.OrderStatus.isValidStatus(status)) {
-            orderEntities = orderRepository.findAllByStatus(status);
+            orderEntities = orderRepository.findAllByStatus(pagination, status).getContent();
         }
         else {
-            orderEntities = orderRepository.findAll();
+            orderEntities = orderRepository.findAll(pagination).getContent();
         }
 
         return orderEntityMapper.orderEntitiesToOrders(orderEntities);

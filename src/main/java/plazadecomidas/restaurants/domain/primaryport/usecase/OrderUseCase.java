@@ -28,7 +28,7 @@ public class OrderUseCase implements IOrderServicePort {
     }
 
     @Override
-    public List<Order> getOrdersByStatus(Integer page, Integer size, String status) {
-        return orderPersistencePort.getOrdersByStatus(page, size, status);
+    public List<Order> getOrdersByStatus(Long userId, Integer page, Integer size, String status) {
+        return orderPersistencePort.getOrdersByStatus(userId, page, size, status);
     }
 }
