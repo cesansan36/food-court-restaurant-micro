@@ -23,12 +23,37 @@ public class DomainConstants {
         RESTAURANT,
         CATEGORY
     }
+
+    public enum OrderFields {
+        ID_CLIENT,
+        DATE,
+        STATUS,
+        ID_CHEF,
+        ID_RESTAURANT,
+        MEALS
+    }
+
     public enum OrderStatus {
         PENDING,
         PREPARING,
         READY,
         DELIVERED,
-        CANCELED
+        CANCELED;
+
+        public static boolean isValidStatus(String status) {
+            for (OrderStatus orderStatus : OrderStatus.values()) {
+                if (orderStatus.name().equals(status)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    public enum MealOrderFields {
+        ID_MEAL,
+        ID_ORDER,
+        QUANTITY
     }
 
     public static final String OWNER_ROLE = "ROLE_OWNER";
@@ -42,4 +67,6 @@ public class DomainConstants {
     public static final String PRICE_NOT_VALID = "The price must be a whole number greater than 0";
     public static final String RESTAURANT_OWNER_MISMATCH_MESSAGE = "The restaurant doesn't belong to the user";
     public static final String CLIENT_HAS_UNFINISHED_ORDERS_MESSAGE = "Client has unfinished orders";
+    public static final String WRONG_STATUS_MESSAGE = "The status used is not a valid status";
+    public static final String QUANTITY_NEGATIVE_MESSAGE = "The quantity must be greater than 0";
 }

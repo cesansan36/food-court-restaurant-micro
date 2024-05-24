@@ -2,7 +2,12 @@ package plazadecomidas.restaurants.TestData;
 
 import plazadecomidas.restaurants.domain.model.Category;
 import plazadecomidas.restaurants.domain.model.Meal;
+import plazadecomidas.restaurants.domain.model.MealOrder;
+import plazadecomidas.restaurants.domain.model.Order;
 import plazadecomidas.restaurants.domain.model.Restaurant;
+
+import java.time.LocalDate;
+import java.util.List;
 
 public class DomainTestData {
 
@@ -17,6 +22,7 @@ public class DomainTestData {
     public static String IMG_URL_FIELD = "logoUrl %s";
     public static String NIT_FIELD = "123456%s";
     public static Long PRICE = 100L;
+    public static String STATUS = "PENDING";
 
     public static Restaurant getValidRestaurant(Long id, Long idOwner) {
         return new Restaurant(1L, NAME_FIELD.formatted(id), ADDRESS_FIELD.formatted(id), idOwner, PHONE_NUMBER_FIELD.formatted(id), IMG_URL_FIELD.formatted(id), NIT_FIELD.formatted(id));
@@ -28,5 +34,13 @@ public class DomainTestData {
 
     public static Meal getValidMeal(Long id) {
         return new Meal(1L, NAME_FIELD.formatted(id), DESCRIPTION_FIELD.formatted(id), PRICE+id, IMG_URL_FIELD.formatted(id), true, getValidRestaurant(id, 1L), getValidCategory(id));
+    }
+
+    public static MealOrder getValidMealOrder(Long idMeal) {
+        return new MealOrder(idMeal, null, 1);
+    }
+
+    public static Order getValidOrder (Long id) {
+        return new Order(id, id, LocalDate.now(), "PENDING", id, id, List.of(getValidMealOrder(id)));
     }
 }

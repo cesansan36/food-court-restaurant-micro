@@ -2,7 +2,12 @@ package plazadecomidas.restaurants.TestData;
 
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.CategoryEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.MealEntity;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.OrderEntity;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.OrderMealEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.RestaurantEntity;
+
+import java.time.LocalDate;
+import java.util.List;
 
 import static org.mockito.Mockito.mock;
 
@@ -33,8 +38,28 @@ public class PersistenceTestData {
             DomainTestData.IMG_URL_FIELD.formatted(id),
             true,
             mock(RestaurantEntity.class),
-            mock(CategoryEntity.class)
+            mock(CategoryEntity.class),
+            null
         );
+    }
 
+    public static OrderMealEntity getValidOrderMealEntity(Long id) {
+        return new OrderMealEntity(
+            getValidMealEntity(id),
+            mock(OrderEntity.class),
+            1
+        );
+    }
+
+    public static OrderEntity getValidOrderEntity(Long id) {
+        return new OrderEntity(
+            id,
+            id,
+            LocalDate.now(),
+            DomainTestData.STATUS,
+            id,
+            getValidRestaurantEntity(id, id),
+            List.of(getValidOrderMealEntity(id))
+        );
     }
 }

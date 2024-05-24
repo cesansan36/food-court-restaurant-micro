@@ -7,7 +7,6 @@ import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryMi
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IOrderEntityMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IMealRepository;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IOrderRepository;
-import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IRestaurantRepository;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.util.PersistenceConstants;
 import plazadecomidas.restaurants.domain.model.Order;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderPersistencePort;
@@ -19,7 +18,6 @@ public class OrderAdapter implements IOrderPersistencePort {
 
     private final IOrderRepository orderRepository;
     private final IMealRepository mealRepository;
-    private final IRestaurantRepository restaurantRepository;
     private final IOrderEntityMapper orderEntityMapper;
 
     @Override

@@ -29,7 +29,9 @@ public class OrderControllerAdapter {
     public ResponseEntity<Void> registerOrder(@RequestHeader("Authorization") String token, @RequestBody AddOrderRequest addOrderRequest) {
         Long userId = getUserId(token);
 
-        orderServicePort.saveOrder(orderRequestMapper.addOrderRequestToOrder(addOrderRequest, userId, ControllerConstants.OrderStatus.PENDING.toString()));
+        orderServicePort.saveOrder(
+                orderRequestMapper.addOrderRequestToOrder(
+                        addOrderRequest, userId, ControllerConstants.OrderStatus.PENDING.toString()));
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

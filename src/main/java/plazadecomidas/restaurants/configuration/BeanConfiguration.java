@@ -57,7 +57,7 @@ public class BeanConfiguration {
 
     @Bean
     public IOrderPersistencePort orderPersistencePort() {
-        return new OrderAdapter(orderRepository, mealRepository, restaurantRepository, orderEntityMapper);
+        return new OrderAdapter(orderRepository, mealRepository, orderEntityMapper);
     }
 
     @Bean
