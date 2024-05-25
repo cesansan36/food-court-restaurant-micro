@@ -68,4 +68,8 @@ public interface IOrderEntityMapper {
     }
 
     List<Order> orderEntitiesToOrders(List<OrderEntity> orderEntities);
+
+    @Mapping(target = "restaurant", source = "idRestaurant", qualifiedByName = "mapRestaurant")
+    @Mapping(target = "meals", source = "meals", qualifiedByName = "mapMeals")
+    OrderEntity orderToOrderEntityWithId(Order order);
 }

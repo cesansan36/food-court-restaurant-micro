@@ -69,4 +69,17 @@ public class Order {
     public List<MealOrder> getMeals() {
         return meals;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", idClient=" + idClient +
+                ", date=" + date +
+                ", status='" + status + '\'' +
+                ", idChef=" + idChef +
+                ", idRestaurant=" + idRestaurant +
+                ", meals=" + meals +
+                '}';
+    }
 }

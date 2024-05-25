@@ -5,6 +5,8 @@ import org.springframework.data.domain.Pageable;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.OrderEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.OrderMealEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryMismatchException;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.WrongConditionsException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.WrongInputException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IOrderEntityMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IMealRepository;
@@ -70,5 +72,31 @@ public class OrderAdapter implements IOrderPersistencePort {
         }
 
         return orderEntityMapper.orderEntitiesToOrders(orderEntities);
+    }
+
+    @Override
+    public void updateOrderPreparing(Order order) {
+        OrderEntity entity = orderRepository.findById(order.getId()).orElseThrow(
+                () -> new RegistryNotFoundException(PersistenceConstants.ORDER_NOT_FOUND_MESSAGE));
+
+        if (!entity.getStatus().equals(DomainConstants.OrderStatus.PENDING.name())) {
+            throw new WrongConditionsException(PersistenceConstants.STATUS_PREPARING_ONLY_FROM_PENDING_MESSAGE);
+        }
+
+        Long restaurantId = employeePersistencePort.getRestaurantIdByEmployeeId(order.getIdChef());
+        if (!restaurantId.equals(entity.getRestaurant().getId())) {
+            throw new RegistryMismatchException(PersistenceConstants.ORDER_EMPLOYEE_MISMATCH_MESSAGE);
+        }
+
+        entity.setStatus(order.getStatus());
+        entity.setIdChef(order.getIdChef());
+        orderRepository.save(entity);
+    }
+
+    @Override
+    public Order getOrderById(Long id) {
+        return orderEntityMapper.orderEntityToOrder(
+                orderRepository.findById(id).orElseThrow(
+                        () -> new RegistryNotFoundException(PersistenceConstants.ORDER_NOT_FOUND_MESSAGE)));
     }
 }

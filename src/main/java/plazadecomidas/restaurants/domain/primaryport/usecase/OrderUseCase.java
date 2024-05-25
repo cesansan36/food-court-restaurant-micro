@@ -31,4 +31,9 @@ public class OrderUseCase implements IOrderServicePort {
     public List<Order> getOrdersByStatus(Long userId, Integer page, Integer size, String status) {
         return orderPersistencePort.getOrdersByStatus(userId, page, size, status);
     }
+
+    @Override
+    public void updateOrderPreparing(Order order) {
+        orderPersistencePort.updateOrderPreparing(order);
+    }
 }

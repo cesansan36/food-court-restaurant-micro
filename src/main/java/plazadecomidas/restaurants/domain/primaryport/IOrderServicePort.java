@@ -8,4 +8,6 @@ public interface IOrderServicePort {
     void saveOrder(Order order);
 
     List<Order> getOrdersByStatus(Long userId, Integer page, Integer size, String status);
+
+    void updateOrderPreparing(Order order);
 }

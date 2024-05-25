@@ -6,12 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddOrderRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateOrderRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.response.OrderResponse;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderRequestMapper;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderResponseMapper;
@@ -60,6 +62,19 @@ public class OrderControllerAdapter {
                                         orderServicePort.getOrdersByStatus(userId, page, size, status));
         return ResponseEntity.ok(orders);
     }
+
+    @PutMapping("assign_chef")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<Void> assignChef(@RequestHeader("Authorization") String token, @RequestBody UpdateOrderRequest request) {
+        Long userId = getUserId(token);
+
+        orderServicePort.updateOrderPreparing(
+                orderRequestMapper.updateOrderRequestToOrder(
+                        request, userId, ControllerConstants.OrderStatus.PREPARING.toString()));
+
+        return ResponseEntity.ok().build();
+    }
+
 
     private Long getUserId(String token) {
         String jwt = token.substring(7);

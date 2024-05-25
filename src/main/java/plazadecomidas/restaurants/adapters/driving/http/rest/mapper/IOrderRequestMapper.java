@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddOrderRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.MealInOrderRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateOrderRequest;
 import plazadecomidas.restaurants.domain.model.MealOrder;
 import plazadecomidas.restaurants.domain.model.Order;
 
@@ -33,5 +34,19 @@ public interface IOrderRequestMapper {
         }
 
         return meals;
+    }
+
+    @Mapping(target = "id", source = "request.id")
+    @Mapping(target = "idClient", constant = "0L")
+    @Mapping(target = "idChef", source = "userId")
+    @Mapping(target = "idRestaurant", constant = "0L")
+    @Mapping(target = "meals", source = "request", qualifiedByName = "dummyMealsList")
+    @Mapping(target = "status", source = "status")
+    @Mapping(target = "date", expression = "java(java.time.LocalDate.now())")
+    Order updateOrderRequestToOrder(UpdateOrderRequest request, Long userId, String status);
+
+    @Named("dummyMealsList")
+    default List<MealOrder> dummyMealsList(UpdateOrderRequest request) {
+        return new ArrayList<>();
     }
 }
