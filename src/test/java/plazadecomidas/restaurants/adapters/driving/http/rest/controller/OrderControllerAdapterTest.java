@@ -5,6 +5,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -13,6 +15,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import plazadecomidas.restaurants.TestData.ControllerTestData;
 import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddOrderRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.response.OrderResponse;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderRequestMapper;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderResponseMapper;
 import plazadecomidas.restaurants.domain.model.Order;
@@ -22,12 +25,15 @@ import plazadecomidas.restaurants.util.ITokenUtils;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -89,5 +95,39 @@ class OrderControllerAdapterTest {
         verify(tokenUtils, times(1)).validateToken(anyString());
         verify(orderRequestMapper, times(1)).addOrderRequestToOrder(any(AddOrderRequest.class), anyLong(), anyString());
         verify(orderServicePort, times(1)).saveOrder(any(Order.class));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "0, 5, PENDING",
+            "-11, 32, DELIVERED",
+            "2, -60, CANCELLED"
+    })
+    void listOrders(Integer page, Integer size, String status) throws Exception {
+
+        String bearerToken = "Bearer 123456789";
+        Claim claim = ControllerTestData.getIdClaim(1L);
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderResponse orderResponse = mock(OrderResponse.class);
+
+        when(tokenUtils.validateToken(anyString())).thenReturn(mock(DecodedJWT.class));
+        when(tokenUtils.getSpecificClaim(any(DecodedJWT.class), anyString())).thenReturn(claim);
+        when(orderResponseMapper.ordersToOrderResponses(anyList())).thenReturn(List.of(orderResponse));
+        when(orderServicePort.getOrdersByStatus(anyLong(), anyInt(), anyInt(), anyString())).thenReturn(List.of(order));
+
+        MockHttpServletRequestBuilder request = get("/orders/list")
+                .header(HttpHeaders.AUTHORIZATION, bearerToken)
+                .param("page", String.valueOf(page))
+                .param("size", String.valueOf(size))
+                .param("status", status);
+
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        verify(tokenUtils, times(1)).getSpecificClaim(any(DecodedJWT.class), anyString());
+        verify(tokenUtils, times(1)).validateToken(anyString());
+        verify(orderResponseMapper, times(1)).ordersToOrderResponses(anyList());
+        verify(orderServicePort, times(1)).getOrdersByStatus(anyLong(), anyInt(), anyInt(), anyString());
     }
 }

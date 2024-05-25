@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.OrderEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.OrderMealEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryMismatchException;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.WrongInputException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IOrderEntityMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IMealRepository;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IOrderRepository;
@@ -61,8 +62,11 @@ public class OrderAdapter implements IOrderPersistencePort {
         if (DomainConstants.OrderStatus.isValidStatus(status)) {
             orderEntities = orderRepository.findAllByRestaurantIdAndStatus(pagination, restaurantId, status).getContent();
         }
-        else {
+        else if (status.equals(PersistenceConstants.ALL_STATUS_FILTER)){
             orderEntities = orderRepository.findAllByRestaurantId(pagination, restaurantId).getContent();
+        }
+        else {
+            throw new WrongInputException(PersistenceConstants.WRONG_STATUS_FILTER_MESSAGE);
         }
 
         return orderEntityMapper.orderEntitiesToOrders(orderEntities);

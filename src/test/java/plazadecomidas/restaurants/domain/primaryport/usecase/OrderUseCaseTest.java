@@ -7,8 +7,13 @@ import plazadecomidas.restaurants.domain.exception.ClientHasUnfinishedOrdersExce
 import plazadecomidas.restaurants.domain.model.Order;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderPersistencePort;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,5 +53,19 @@ class OrderUseCaseTest {
 
         verify(orderPersistencePort, times(0)).saveOrder(order);
         verify(orderPersistencePort, times(1)).getAmountOfUnfinishedOrders(anyLong());
+    }
+
+    @Test
+    void getOrdersByStatus() {
+        Order order = DomainTestData.getValidOrder(1L);
+
+        when(orderPersistencePort.getOrdersByStatus(anyLong(), anyInt(), anyInt(), anyString())).thenReturn(List.of(order));
+
+        List<Order> orders = orderUseCase.getOrdersByStatus(1L, 0, 10, "PENDING");
+
+        verify(orderPersistencePort, times(1)).getOrdersByStatus(anyLong(), anyInt(), anyInt(), anyString());
+        assertEquals(List.of(order), orders);
+        assertEquals(1, orders.size());
+
     }
 }

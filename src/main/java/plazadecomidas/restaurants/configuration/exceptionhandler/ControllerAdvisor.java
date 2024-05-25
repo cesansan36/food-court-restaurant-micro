@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryAlreadyExistsException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryMismatchException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.WrongInputException;
 import plazadecomidas.restaurants.adapters.driving.http.rest.exception.IdMismatchException;
 import plazadecomidas.restaurants.domain.exception.ClientHasUnfinishedOrdersException;
 import plazadecomidas.restaurants.domain.exception.DataMismatchException;
@@ -61,6 +62,12 @@ public class ControllerAdvisor {
     }
     @ExceptionHandler(IdMismatchException.class)
     public ResponseEntity<ExceptionResponse> handleIdMismatchException(IdMismatchException exception) {
+        return ResponseEntity.badRequest().body(new ExceptionResponse(
+                exception.getMessage(), HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(WrongInputException.class)
+    public ResponseEntity<ExceptionResponse> handleWrongInputException(WrongInputException exception) {
         return ResponseEntity.badRequest().body(new ExceptionResponse(
                 exception.getMessage(), HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now()));
     }

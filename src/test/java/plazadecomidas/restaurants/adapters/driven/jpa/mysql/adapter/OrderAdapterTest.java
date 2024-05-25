@@ -2,17 +2,27 @@ package plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.TestData.PersistenceTestData;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.OrderEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.OrderMealEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryMismatchException;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.WrongInputException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IOrderEntityMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IMealRepository;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IOrderRepository;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.util.PersistenceConstants;
 import plazadecomidas.restaurants.domain.model.Order;
+import plazadecomidas.restaurants.domain.secondaryport.IEmployeePersistencePort;
+import plazadecomidas.restaurants.domain.util.DomainConstants;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,13 +40,15 @@ class OrderAdapterTest {
     private IOrderRepository orderRepository;
     private IMealRepository mealRepository;
     private IOrderEntityMapper orderEntityMapper;
+    private IEmployeePersistencePort employeePersistencePort;
 
     @BeforeEach
     void setUp() {
         orderRepository = mock(IOrderRepository.class);
         mealRepository = mock(IMealRepository.class);
         orderEntityMapper = mock(IOrderEntityMapper.class);
-        orderAdapter = new OrderAdapter(orderRepository, mealRepository, orderEntityMapper);
+        employeePersistencePort = mock(IEmployeePersistencePort.class);
+        orderAdapter = new OrderAdapter(orderRepository, mealRepository, orderEntityMapper, employeePersistencePort);
     }
 
     @Test
@@ -82,5 +94,65 @@ class OrderAdapterTest {
         verify(orderRepository, times(0)).save(any(OrderEntity.class));
         verify(mealRepository, times(1)).findRestaurantIdsByMealIds(anyList());
         verify(orderEntityMapper, times(1)).orderToOrderEntity(any(Order.class));
+    }
+
+    @Test
+    void getOrdersByStatusAll() {
+        Long userId = 1L;
+        int page = 1;
+        int size = 10;
+        String status = PersistenceConstants.ALL_STATUS_FILTER;
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+        Order order = DomainTestData.getValidOrder(1L);
+
+        when(employeePersistencePort.getRestaurantIdByEmployeeId(anyLong())).thenReturn(1L);
+        when(orderRepository.findAllByRestaurantId(any(Pageable.class), anyLong())).thenReturn(new PageImpl<>(List.of(orderEntity)));
+        when(orderEntityMapper.orderEntitiesToOrders(anyList())).thenReturn(List.of(order));
+
+        List<Order> orders = orderAdapter.getOrdersByStatus(userId, page, size, status);
+
+        assertAll(
+            () -> assertEquals(List.of(order), orders),
+            () -> verify(orderRepository, times(1)).findAllByRestaurantId(any(Pageable.class), anyLong()),
+            () -> verify(orderEntityMapper, times(1)).orderEntitiesToOrders(anyList()),
+            () -> verify(employeePersistencePort, times(1)).getRestaurantIdByEmployeeId(anyLong()),
+            () -> verify(orderRepository, times(0)).findAllByRestaurantIdAndStatus(any(Pageable.class), anyLong(), any(String.class))
+        );
+    }
+
+    @ParameterizedTest
+    @EnumSource(DomainConstants.OrderStatus.class)
+    void getOrdersByStatusFiltered(DomainConstants.OrderStatus status) {
+        Long userId = 1L;
+        int page = 1;
+        int size = 10;
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+        Order order = DomainTestData.getValidOrder(1L);
+
+        when(employeePersistencePort.getRestaurantIdByEmployeeId(anyLong())).thenReturn(1L);
+        when(orderRepository.findAllByRestaurantIdAndStatus(any(Pageable.class), anyLong(), any(String.class))).thenReturn(new PageImpl<>(List.of(orderEntity)));
+        when(orderEntityMapper.orderEntitiesToOrders(anyList())).thenReturn(List.of(order));
+
+        List<Order> orders = orderAdapter.getOrdersByStatus(userId, page, size, status.name());
+
+        assertAll(
+                () -> assertEquals(List.of(order), orders),
+                () -> verify(orderRepository, times(1)).findAllByRestaurantIdAndStatus(any(Pageable.class), anyLong(), any(String.class)),
+                () -> verify(orderEntityMapper, times(1)).orderEntitiesToOrders(anyList()),
+                () -> verify(employeePersistencePort, times(1)).getRestaurantIdByEmployeeId(anyLong()),
+                () -> verify(orderRepository, times(0)).findAllByRestaurantId(any(Pageable.class), anyLong())
+        );
+    }
+
+    @Test
+    void getOrdersByStatusExceptionByWrongStatusFilter() {
+        Long userId = 1L;
+        int page = 1;
+        int size = 10;
+        String status = "wrong status filter";
+
+        when(employeePersistencePort.getRestaurantIdByEmployeeId(anyLong())).thenReturn(1L);
+
+        assertThrows(WrongInputException.class, () -> orderAdapter.getOrdersByStatus(userId, page, size, status));
     }
 }

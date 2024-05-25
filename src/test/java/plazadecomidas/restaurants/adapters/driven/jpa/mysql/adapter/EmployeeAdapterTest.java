@@ -7,6 +7,7 @@ import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IEmployeeEnti
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IEmployeeRepository;
 import plazadecomidas.restaurants.domain.model.Employee;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -37,5 +38,18 @@ class EmployeeAdapterTest {
         employeeAdapter.saveEmployee(employee);
 
         verify(employeeRepository, times(1)).save(employeeEntity);
+    }
+
+    @Test
+    void getRestaurantIdByEmployeeId() {
+        Long idEmployee = 1L;
+        Long idRestaurant = 1L;
+
+        when(employeeRepository.findIdRestaurantByIdEmployee(any(Long.class))).thenReturn(idRestaurant);
+
+        Long result = employeeAdapter.getRestaurantIdByEmployeeId(idEmployee);
+
+        verify(employeeRepository, times(1)).findIdRestaurantByIdEmployee(idEmployee);
+        assertEquals(idRestaurant, result);
     }
 }
