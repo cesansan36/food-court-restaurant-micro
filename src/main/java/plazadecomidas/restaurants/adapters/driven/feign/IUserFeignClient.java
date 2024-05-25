@@ -9,5 +9,5 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface IUserFeignClient {
 
     @GetMapping("user/verify-role")
-    public ResponseEntity<Boolean> verifyRole(@RequestParam Long id, @RequestParam String role);
+    ResponseEntity<Boolean> verifyRole(@RequestParam Long id, @RequestParam String role);
 }

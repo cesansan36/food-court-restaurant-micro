@@ -92,11 +92,4 @@ public class OrderAdapter implements IOrderPersistencePort {
         entity.setIdChef(order.getIdChef());
         orderRepository.save(entity);
     }
-
-    @Override
-    public Order getOrderById(Long id) {
-        return orderEntityMapper.orderEntityToOrder(
-                orderRepository.findById(id).orElseThrow(
-                        () -> new RegistryNotFoundException(PersistenceConstants.ORDER_NOT_FOUND_MESSAGE)));
-    }
 }

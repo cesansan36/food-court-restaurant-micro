@@ -2,6 +2,7 @@ package plazadecomidas.restaurants.adapters.driving.http.rest.controller;
 
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import plazadecomidas.restaurants.TestData.ControllerTestData;
 import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddOrderRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateOrderRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.response.OrderResponse;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderRequestMapper;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderResponseMapper;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -129,5 +132,38 @@ class OrderControllerAdapterTest {
         verify(tokenUtils, times(1)).validateToken(anyString());
         verify(orderResponseMapper, times(1)).ordersToOrderResponses(anyList());
         verify(orderServicePort, times(1)).getOrdersByStatus(anyLong(), anyInt(), anyInt(), anyString());
+    }
+
+    @Test
+    void assignChef() throws Exception {
+
+        Object objectInput = new Object() {
+            public final Long id = 1L;
+        };
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String inputJson = objectMapper.writeValueAsString(objectInput);
+
+        String bearerToken = "Bearer 123456789";
+        Claim claim = ControllerTestData.getIdClaim(1L);
+        Order order = DomainTestData.getValidOrder(1L);
+
+        when(tokenUtils.validateToken(anyString())).thenReturn(mock(DecodedJWT.class));
+        when(tokenUtils.getSpecificClaim(any(DecodedJWT.class), anyString())).thenReturn(claim);
+        when(orderRequestMapper.updateOrderRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString())).thenReturn(order);
+
+        MockHttpServletRequestBuilder request = put("/orders/assign_chef")
+                .header(HttpHeaders.AUTHORIZATION, bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(inputJson);
+
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        verify(tokenUtils, times(1)).getSpecificClaim(any(DecodedJWT.class), anyString());
+        verify(tokenUtils, times(1)).validateToken(anyString());
+        verify(orderRequestMapper, times(1)).updateOrderRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString());
+        verify(orderServicePort, times(1)).updateOrderPreparing(any(Order.class));
     }
 }

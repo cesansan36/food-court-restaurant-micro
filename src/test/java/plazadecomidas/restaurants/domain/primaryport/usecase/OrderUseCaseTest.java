@@ -68,4 +68,13 @@ class OrderUseCaseTest {
         assertEquals(1, orders.size());
 
     }
+
+    @Test
+    void updateOrderPreparing() {
+        Order order = DomainTestData.getValidOrder(1L);
+
+        orderUseCase.updateOrderPreparing(order);
+
+        verify(orderPersistencePort, times(1)).updateOrderPreparing(order);
+    }
 }

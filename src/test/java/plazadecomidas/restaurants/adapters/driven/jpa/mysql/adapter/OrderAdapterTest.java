@@ -11,6 +11,8 @@ import plazadecomidas.restaurants.TestData.PersistenceTestData;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.OrderEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.OrderMealEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryMismatchException;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.WrongConditionsException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.WrongInputException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IOrderEntityMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IMealRepository;
@@ -21,6 +23,7 @@ import plazadecomidas.restaurants.domain.secondaryport.IEmployeePersistencePort;
 import plazadecomidas.restaurants.domain.util.DomainConstants;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -154,5 +157,71 @@ class OrderAdapterTest {
         when(employeePersistencePort.getRestaurantIdByEmployeeId(anyLong())).thenReturn(1L);
 
         assertThrows(WrongInputException.class, () -> orderAdapter.getOrdersByStatus(userId, page, size, status));
+    }
+
+    @Test
+    void updateOrderPreparingSuccess() {
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
+        when(employeePersistencePort.getRestaurantIdByEmployeeId(anyLong())).thenReturn(1L);
+
+        orderAdapter.updateOrderPreparing(order);
+
+        assertAll(
+            () -> verify(orderRepository, times(1)).findById(anyLong()),
+            () -> verify(orderRepository, times(1)).save(any(OrderEntity.class)),
+            () -> verify(employeePersistencePort, times(1)).getRestaurantIdByEmployeeId(anyLong())
+        );
+    }
+
+    @Test
+    void updateOrderPreparingFailOnOrderEmployeeMismatch() {
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
+        when(employeePersistencePort.getRestaurantIdByEmployeeId(anyLong())).thenReturn(2L);
+
+        assertThrows(RegistryMismatchException.class, () -> orderAdapter.updateOrderPreparing(order));
+
+        assertAll(
+                () -> verify(orderRepository, times(1)).findById(anyLong()),
+                () -> verify(orderRepository, times(0)).save(any(OrderEntity.class)),
+                () -> verify(employeePersistencePort, times(1)).getRestaurantIdByEmployeeId(anyLong())
+        );
+    }
+
+    @Test
+    void updateOrderPreparingFailOnStatusNotPending() {
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+        orderEntity.setStatus("DELIVERED");
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
+
+        assertThrows(WrongConditionsException.class, () -> orderAdapter.updateOrderPreparing(order));
+
+        assertAll(
+                () -> verify(orderRepository, times(1)).findById(anyLong()),
+                () -> verify(orderRepository, times(0)).save(any(OrderEntity.class)),
+                () -> verify(employeePersistencePort, times(0)).getRestaurantIdByEmployeeId(anyLong())
+        );
+    }
+
+    @Test
+    void updateOrderPreparingFailOnOrderNotFound() {
+        Order order = DomainTestData.getValidOrder(1L);
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(RegistryNotFoundException.class, () -> orderAdapter.updateOrderPreparing(order));
+
+        assertAll(
+                () -> verify(orderRepository, times(1)).findById(anyLong()),
+                () -> verify(orderRepository, times(0)).save(any(OrderEntity.class)),
+                () -> verify(employeePersistencePort, times(0)).getRestaurantIdByEmployeeId(anyLong())
+        );
     }
 }

@@ -37,7 +37,7 @@ public class OrderEntity {
     private LocalDate date;
     private String status;
 
-    @Column(name = "id_chef", nullable = true)
+    @Column(name = "id_chef")
     private Long idChef;
 
     @ManyToOne
@@ -46,17 +46,4 @@ public class OrderEntity {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderMealEntity> meals = new ArrayList<>();
-
-    @Override
-    public String toString() {
-        return "OrderEntity{" +
-                "id=" + id +
-                ", idClient=" + idClient +
-                ", date=" + date +
-                ", status='" + status + '\'' +
-                ", idChef=" + idChef +
-                ", restaurant=" + restaurant +
-                ", meals=" + meals +
-                '}';
-    }
 }
