@@ -16,4 +16,9 @@ public class EmployeeAdapter implements IEmployeePersistencePort {
     public void saveEmployee(Employee employee) {
         employeeRepository.save(employeeEntityMapper.employeeToEmployeeEntity(employee));
     }
+
+    @Override
+    public Long getRestaurantIdByEmployeeId(Long idEmployee) {
+        return employeeRepository.findIdRestaurantByIdEmployee(idEmployee);
+    }
 }

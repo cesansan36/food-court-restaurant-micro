@@ -20,5 +20,6 @@ public class EmployeeEntity {
     @Id
     @Column(name = "id")
     private Long idEmployee;
+    @Column(name = "id_restaurant")
     private Long idRestaurant;
 }

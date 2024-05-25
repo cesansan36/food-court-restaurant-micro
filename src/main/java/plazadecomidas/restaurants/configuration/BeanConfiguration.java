@@ -64,8 +64,8 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public IOrderPersistencePort orderPersistencePort() {
-        return new OrderAdapter(orderRepository, mealRepository, orderEntityMapper);
+    public IOrderPersistencePort orderPersistencePort(IEmployeePersistencePort employeePersistencePort) {
+        return new OrderAdapter(orderRepository, mealRepository, orderEntityMapper, employeePersistencePort);
     }
 
     @Bean

@@ -12,8 +12,7 @@ public interface IOrderRepository extends JpaRepository<OrderEntity, Long> {
     @Query("SELECT COUNT(o) FROM OrderEntity o WHERE o.idClient = :clientId AND o.status IN ('PENDING', 'PREPARING', 'READY')")
     int countPendingOrPreparingOrReadyOrdersByClientId(@Param("clientId") Long clientId);
 
-    Page<OrderEntity> findAllByStatus(Pageable pageable, String status);
+    Page<OrderEntity> findAllByRestaurantId(Pageable pageable, Long restaurantId);
 
-
-    Page<OrderEntity> findAll(Pageable pageable);
+    Page<OrderEntity> findAllByRestaurantIdAndStatus(Pageable pageable, Long restaurantId, String status);
 }

@@ -10,6 +10,7 @@ import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IMealRepo
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IOrderRepository;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.util.PersistenceConstants;
 import plazadecomidas.restaurants.domain.model.Order;
+import plazadecomidas.restaurants.domain.secondaryport.IEmployeePersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderPersistencePort;
 import plazadecomidas.restaurants.domain.util.DomainConstants;
 
@@ -21,6 +22,7 @@ public class OrderAdapter implements IOrderPersistencePort {
     private final IOrderRepository orderRepository;
     private final IMealRepository mealRepository;
     private final IOrderEntityMapper orderEntityMapper;
+    private final IEmployeePersistencePort employeePersistencePort;
 
     @Override
     public int getAmountOfUnfinishedOrders(Long clientId) {
@@ -49,15 +51,18 @@ public class OrderAdapter implements IOrderPersistencePort {
 
     @Override
     public List<Order> getOrdersByStatus(Long userId, Integer page, Integer size, String status) {
+
+        Long restaurantId = employeePersistencePort.getRestaurantIdByEmployeeId(userId);
+
         List<OrderEntity> orderEntities;
 
         Pageable pagination = Pageable.ofSize(size).withPage(page);
 
         if (DomainConstants.OrderStatus.isValidStatus(status)) {
-            orderEntities = orderRepository.findAllByStatus(pagination, status).getContent();
+            orderEntities = orderRepository.findAllByRestaurantIdAndStatus(pagination, restaurantId, status).getContent();
         }
         else {
-            orderEntities = orderRepository.findAll(pagination).getContent();
+            orderEntities = orderRepository.findAllByRestaurantId(pagination, restaurantId).getContent();
         }
 
         return orderEntityMapper.orderEntitiesToOrders(orderEntities);

@@ -32,8 +32,6 @@ public class RestaurantAdapter implements IRestaurantPersistencePort {
 
     @Override
     public boolean existsRestaurantOwnerPair(Long idRestaurant, Long idOwner) {
-
-
         Optional<RestaurantEntity> restaurant = restaurantRepository.findByIdAndOwnerId(idRestaurant, idOwner);
 
         if (restaurant.isEmpty()) {
