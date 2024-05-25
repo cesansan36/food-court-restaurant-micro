@@ -3,6 +3,9 @@ package plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.TestData.PersistenceTestData;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.RestaurantEntity;
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -110,5 +114,18 @@ class RestaurantAdapterTest {
 
         restaurantAdapter.getAllRestaurants();
         verify(restaurantRepository, times(1)).findAll();
+    }
+
+    @ParameterizedTest
+    @CsvSource({ "true", "false" })
+    @DisplayName("restaurant owner match found")
+    void existsOwnerRestaurantMatch(boolean expected) {
+
+        when(restaurantRepository.existsByOwnerIdAndId(anyLong(), anyLong())).thenReturn(expected);
+
+        boolean result = restaurantAdapter.existsOwnerRestaurantMatch(1L, 1L);
+
+        assertEquals(expected, result);
+        verify(restaurantRepository, times(1)).existsByOwnerIdAndId(anyLong(), anyLong());
     }
 }

@@ -54,7 +54,6 @@ public class OrderControllerAdapter {
         if (page < 0) { page = 0; }
         if (size < 1) { size = 5; }
 
-        // TODO: Aclarar como se relaciona un empleado con el restaurante
         Long userId = getUserId(token);
 
         List<OrderResponse> orders = orderResponseMapper.ordersToOrderResponses(

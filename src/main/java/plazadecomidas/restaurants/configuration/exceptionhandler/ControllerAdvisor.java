@@ -13,7 +13,6 @@ import plazadecomidas.restaurants.domain.exception.DataMismatchException;
 import plazadecomidas.restaurants.domain.exception.EmptyFieldException;
 import plazadecomidas.restaurants.domain.exception.FieldRuleInvalidException;
 
-import javax.sound.midi.InvalidMidiDataException;
 import java.time.LocalDateTime;
 
 @ControllerAdvice

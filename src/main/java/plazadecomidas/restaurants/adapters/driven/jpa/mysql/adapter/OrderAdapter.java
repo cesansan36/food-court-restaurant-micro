@@ -48,7 +48,7 @@ public class OrderAdapter implements IOrderPersistencePort {
     }
 
     @Override
-    public List<Order> getOrdersByStatus(Long UserId, Integer page, Integer size, String status) {
+    public List<Order> getOrdersByStatus(Long userId, Integer page, Integer size, String status) {
         List<OrderEntity> orderEntities;
 
         Pageable pagination = Pageable.ofSize(size).withPage(page);
