@@ -7,7 +7,6 @@ import plazadecomidas.restaurants.adapters.driven.connection.feign.IMessagingFei
 import plazadecomidas.restaurants.adapters.driven.connection.mapper.ISendMessageRequestMapper;
 import plazadecomidas.restaurants.domain.model.Order;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
