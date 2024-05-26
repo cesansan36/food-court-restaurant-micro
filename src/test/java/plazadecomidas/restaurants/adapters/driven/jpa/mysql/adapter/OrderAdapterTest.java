@@ -224,4 +224,83 @@ class OrderAdapterTest {
                 () -> verify(employeePersistencePort, times(0)).getRestaurantIdByEmployeeId(anyLong())
         );
     }
+
+    @Test
+    void updateOrderReadySuccess() {
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+        orderEntity.setStatus(DomainConstants.OrderStatus.PREPARING.name());
+        Long restaurantId = 1L;
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
+        when(employeePersistencePort.getRestaurantIdByEmployeeId(anyLong())).thenReturn(restaurantId);
+        when(orderRepository.save(any(OrderEntity.class))).thenReturn(orderEntity);
+        when(orderEntityMapper.orderEntityToOrder(any(OrderEntity.class))).thenReturn(order);
+
+        Order updatedOrder = orderAdapter.updateOrderReady(order);
+
+        assertAll(
+            () -> assertEquals(order, updatedOrder),
+            () -> verify(orderRepository, times(1)).findById(anyLong()),
+            () -> verify(orderRepository, times(1)).save(any(OrderEntity.class)),
+            () -> verify(employeePersistencePort, times(1)).getRestaurantIdByEmployeeId(anyLong()),
+            () -> verify(orderEntityMapper, times(1)).orderEntityToOrder(any(OrderEntity.class))
+        );
+    }
+
+    @Test
+    void updateOrderReadyFailBecauseOrderEmployeeMismatch() {
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+        orderEntity.setStatus(DomainConstants.OrderStatus.PREPARING.name());
+        Long restaurantId = 2L;
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
+        when(employeePersistencePort.getRestaurantIdByEmployeeId(anyLong())).thenReturn(restaurantId);
+        when(orderRepository.save(any(OrderEntity.class))).thenReturn(orderEntity);
+        when(orderEntityMapper.orderEntityToOrder(any(OrderEntity.class))).thenReturn(order);
+
+        assertThrows(RegistryMismatchException.class, () -> orderAdapter.updateOrderReady(order));
+
+        assertAll(
+            () -> verify(orderRepository, times(1)).findById(anyLong()),
+            () -> verify(orderRepository, times(0)).save(any(OrderEntity.class)),
+            () -> verify(employeePersistencePort, times(1)).getRestaurantIdByEmployeeId(anyLong()),
+            () -> verify(orderEntityMapper, times(0)).orderEntityToOrder(any(OrderEntity.class))
+        );
+    }
+
+    @Test
+    void updateOrderReadyFailBecauseStatusNotPreparing() {
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+        orderEntity.setStatus(DomainConstants.OrderStatus.DELIVERED.name());
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
+
+        assertThrows(WrongConditionsException.class, () -> orderAdapter.updateOrderReady(order));
+
+        assertAll(
+            () -> verify(orderRepository, times(1)).findById(anyLong()),
+            () -> verify(orderRepository, times(0)).save(any(OrderEntity.class)),
+            () -> verify(employeePersistencePort, times(0)).getRestaurantIdByEmployeeId(anyLong()),
+            () -> verify(orderEntityMapper, times(0)).orderEntityToOrder(any(OrderEntity.class))
+        );
+    }
+
+    @Test
+    void updateOrderReadyFailBecauseOrderNotFound() {
+        Order order = DomainTestData.getValidOrder(1L);
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(RegistryNotFoundException.class, () -> orderAdapter.updateOrderReady(order));
+
+        assertAll(
+            () -> verify(orderRepository, times(1)).findById(anyLong()),
+            () -> verify(orderRepository, times(0)).save(any(OrderEntity.class)),
+            () -> verify(employeePersistencePort, times(0)).getRestaurantIdByEmployeeId(anyLong()),
+            () -> verify(orderEntityMapper, times(0)).orderEntityToOrder(any(OrderEntity.class))
+        );
+    }
 }

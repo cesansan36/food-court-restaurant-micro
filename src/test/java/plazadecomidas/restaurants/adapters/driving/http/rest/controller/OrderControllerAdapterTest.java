@@ -166,4 +166,34 @@ class OrderControllerAdapterTest {
         verify(orderRequestMapper, times(1)).updateOrderRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString());
         verify(orderServicePort, times(1)).updateOrderPreparing(any(Order.class));
     }
+
+    @Test
+    void setReady() throws Exception {
+        Object inputObject = new Object() {
+            public final Long id = 1L;
+        };
+        ObjectMapper objectMapper = new ObjectMapper();
+        String inputJson = objectMapper.writeValueAsString(inputObject);
+
+        Claim claim = ControllerTestData.getIdClaim(1L);
+        Order order = DomainTestData.getValidOrder(1L);
+        String token = "Bearer token";
+
+        when(tokenUtils.validateToken(anyString())).thenReturn(mock(DecodedJWT.class));
+        when(tokenUtils.getSpecificClaim(any(DecodedJWT.class), anyString())).thenReturn(claim);
+        when(orderRequestMapper.updateOrderRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString())).thenReturn(order);
+
+        MockHttpServletRequestBuilder request = put("/orders/set_ready")
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(inputJson);
+
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        verify(tokenUtils, times(1)).validateToken(anyString());
+        verify(orderRequestMapper, times(1)).updateOrderRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString());
+        verify(orderServicePort, times(1)).updateOrderReady(any(Order.class), anyString());
+    }
 }

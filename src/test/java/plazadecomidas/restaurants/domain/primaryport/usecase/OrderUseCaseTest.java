@@ -3,9 +3,12 @@ package plazadecomidas.restaurants.domain.primaryport.usecase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import plazadecomidas.restaurants.TestData.DomainTestData;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
 import plazadecomidas.restaurants.domain.exception.ClientHasUnfinishedOrdersException;
 import plazadecomidas.restaurants.domain.model.Order;
+import plazadecomidas.restaurants.domain.secondaryport.IOrderMessagingPort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderPersistencePort;
+import plazadecomidas.restaurants.domain.secondaryport.IUserConnectionPort;
 
 import java.util.List;
 
@@ -14,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,11 +28,15 @@ class OrderUseCaseTest {
     private OrderUseCase orderUseCase;
 
     private IOrderPersistencePort orderPersistencePort;
+    private IUserConnectionPort userConnectionPort;
+    private IOrderMessagingPort orderMessagingPort;
 
     @BeforeEach
     void setUp() {
         orderPersistencePort = mock(IOrderPersistencePort.class);
-        orderUseCase = new OrderUseCase(orderPersistencePort);
+        userConnectionPort = mock(IUserConnectionPort.class);
+        orderMessagingPort = mock(IOrderMessagingPort.class);
+        orderUseCase = new OrderUseCase(orderPersistencePort, userConnectionPort, orderMessagingPort);
     }
 
     @Test
@@ -76,5 +84,35 @@ class OrderUseCaseTest {
         orderUseCase.updateOrderPreparing(order);
 
         verify(orderPersistencePort, times(1)).updateOrderPreparing(order);
+    }
+
+    @Test
+    void updateOrderReadySuccess() {
+        Order order = DomainTestData.getValidOrder(1L);
+        String token = "token";
+        String phoneNumber = "123456789";
+
+        when(orderPersistencePort.updateOrderReady(order)).thenReturn(order);
+        when(userConnectionPort.getUserPhoneNumber(anyLong(), anyString())).thenReturn(phoneNumber);
+
+        orderUseCase.updateOrderReady(order, token);
+
+        verify(orderPersistencePort, times(1)).updateOrderReady(order);
+        verify(orderMessagingPort, times(1)).sendOrderReadyMessage(token, order, phoneNumber);
+    }
+
+    @Test
+    void updateOrderReadyFailOnUserNotFound() {
+        Order order = DomainTestData.getValidOrder(1L);
+        String token = "token";
+        String phoneNumber = "123456789";
+
+        when(orderPersistencePort.updateOrderReady(order)).thenReturn(order);
+        doThrow(new RuntimeException()).when(userConnectionPort).getUserPhoneNumber(anyLong(), anyString());
+
+        assertThrows(RegistryNotFoundException.class, () -> orderUseCase.updateOrderReady(order, token));
+
+        verify(orderPersistencePort, times(1)).updateOrderReady(order);
+        verify(orderMessagingPort, times(0)).sendOrderReadyMessage(token, order, phoneNumber);
     }
 }
