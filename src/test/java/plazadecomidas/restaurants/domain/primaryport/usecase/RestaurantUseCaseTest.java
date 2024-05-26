@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 import plazadecomidas.restaurants.TestData.DomainTestData;
-import plazadecomidas.restaurants.adapters.driven.feign.IUserFeignClient;
+import plazadecomidas.restaurants.adapters.driven.connection.feign.IUserFeignClient;
 import plazadecomidas.restaurants.domain.exception.FieldRuleInvalidException;
 import plazadecomidas.restaurants.domain.model.Restaurant;
 import plazadecomidas.restaurants.domain.secondaryport.IRestaurantPersistencePort;

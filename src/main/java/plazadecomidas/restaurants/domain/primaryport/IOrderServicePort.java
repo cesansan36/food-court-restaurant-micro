@@ -10,4 +10,6 @@ public interface IOrderServicePort {
     List<Order> getOrdersByStatus(Long userId, Integer page, Integer size, String status);
 
     void updateOrderPreparing(Order order);
+
+    void updateOrderReady(Order order, String token);
 }

@@ -1,11 +1,10 @@
 package plazadecomidas.restaurants.domain.primaryport.usecase;
 
-import org.springframework.http.ResponseEntity;
-import plazadecomidas.restaurants.adapters.driven.feign.IUserFeignClient;
 import plazadecomidas.restaurants.domain.exception.FieldRuleInvalidException;
 import plazadecomidas.restaurants.domain.model.Restaurant;
 import plazadecomidas.restaurants.domain.primaryport.IRestaurantServicePort;
 import plazadecomidas.restaurants.domain.secondaryport.IRestaurantPersistencePort;
+import plazadecomidas.restaurants.domain.secondaryport.IUserConnectionPort;
 import plazadecomidas.restaurants.domain.util.DomainConstants;
 
 import java.util.List;
@@ -13,25 +12,24 @@ import java.util.List;
 public class RestaurantUseCase implements IRestaurantServicePort {
 
     private final IRestaurantPersistencePort restaurantPersistencePort;
-    private final IUserFeignClient userFeignClient;
+    private final IUserConnectionPort userConnectionPort;
 
-    public RestaurantUseCase(IRestaurantPersistencePort restaurantPersistencePort, IUserFeignClient userFeignClient) {
+    public RestaurantUseCase(IRestaurantPersistencePort restaurantPersistencePort, IUserConnectionPort userConnectionPort) {
         this.restaurantPersistencePort = restaurantPersistencePort;
-        this.userFeignClient = userFeignClient;
+        this.userConnectionPort = userConnectionPort;
     }
 
     @Override
     public void saveRestaurant(Restaurant restaurant) {
 
-        ResponseEntity<Boolean> isUserValid;
-
+        boolean isUserValid;
         try {
-            isUserValid = userFeignClient.verifyRole(restaurant.getOwnerId(), DomainConstants.OWNER_ROLE);
+            isUserValid = userConnectionPort.verifyRole(restaurant.getOwnerId(), DomainConstants.OWNER_ROLE);
         } catch (Exception e) {
-            throw new FieldRuleInvalidException(DomainConstants.USER_ID_NOT_FOUND.formatted(e.getMessage()));
+            throw new FieldRuleInvalidException(DomainConstants.USER_ID_NOT_FOUND_MESSAGE.formatted(e.getMessage()));
         }
 
-        if (Boolean.FALSE.equals(isUserValid.getBody())) {
+        if (!isUserValid) {
             throw new FieldRuleInvalidException(DomainConstants.OWNER_ID_INVALID_MESSAGE);
         }
 

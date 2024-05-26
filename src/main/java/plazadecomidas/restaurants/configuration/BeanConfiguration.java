@@ -3,7 +3,11 @@ package plazadecomidas.restaurants.configuration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import plazadecomidas.restaurants.adapters.driven.feign.IUserFeignClient;
+import plazadecomidas.restaurants.adapters.driven.connection.adapter.MessagingAdapter;
+import plazadecomidas.restaurants.adapters.driven.connection.adapter.UserAdapter;
+import plazadecomidas.restaurants.adapters.driven.connection.feign.IMessagingFeignClient;
+import plazadecomidas.restaurants.adapters.driven.connection.feign.IUserFeignClient;
+import plazadecomidas.restaurants.adapters.driven.connection.mapper.ISendMessageRequestMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.EmployeeAdapter;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.MealAdapter;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.OrderAdapter;
@@ -26,8 +30,10 @@ import plazadecomidas.restaurants.domain.primaryport.usecase.OrderUseCase;
 import plazadecomidas.restaurants.domain.primaryport.usecase.RestaurantUseCase;
 import plazadecomidas.restaurants.domain.secondaryport.IEmployeePersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IMealPersistencePort;
+import plazadecomidas.restaurants.domain.secondaryport.IOrderMessagingPort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IRestaurantPersistencePort;
+import plazadecomidas.restaurants.domain.secondaryport.IUserConnectionPort;
 
 @Configuration
 @RequiredArgsConstructor
@@ -49,8 +55,9 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public IRestaurantServicePort restaurantServicePort() {
-        return new RestaurantUseCase(restaurantPersistencePort(), userFeignClient);
+    public IRestaurantServicePort restaurantServicePort(IRestaurantPersistencePort restaurantPersistencePort,
+                                                         IUserConnectionPort userConnectionPort) {
+        return new RestaurantUseCase(restaurantPersistencePort, userConnectionPort);
     }
 
     @Bean
@@ -69,8 +76,8 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public IOrderServicePort orderServicePort(IOrderPersistencePort orderPersistencePort) {
-        return new OrderUseCase(orderPersistencePort);
+    public IOrderServicePort orderServicePort(IOrderPersistencePort orderPersistencePort, IUserConnectionPort userConnectionPort, IOrderMessagingPort orderMessagingPort) {
+        return new OrderUseCase(orderPersistencePort, userConnectionPort, orderMessagingPort);
     }
 
     @Bean
@@ -81,5 +88,16 @@ public class BeanConfiguration {
     @Bean
     public IEmployeeServicePort employeeServicePort(IEmployeePersistencePort employeePersistencePort, IRestaurantPersistencePort restaurantPersistencePort) {
         return new EmployeeUseCase(employeePersistencePort, restaurantPersistencePort);
+    }
+
+    @Bean
+    public IOrderMessagingPort orderMessagingPort(ISendMessageRequestMapper sendMessageRequestMapper,
+                                                  IMessagingFeignClient messagingFeignClient) {
+        return new MessagingAdapter(sendMessageRequestMapper, messagingFeignClient);
+    }
+
+    @Bean
+    public IUserConnectionPort userConnectionPort(IUserFeignClient userFeignClient) {
+        return new UserAdapter(userFeignClient);
     }
 }

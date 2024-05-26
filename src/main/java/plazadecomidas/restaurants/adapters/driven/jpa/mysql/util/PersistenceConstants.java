@@ -14,5 +14,6 @@ public class PersistenceConstants {
     public static final String MEAL_RESTAURANT_MISMATCH_EXCEPTION = "At least one meal doesn't belong to the selected restaurant";
     public static final String WRONG_STATUS_FILTER_MESSAGE = "The filter you are trying to use is not valid. Please, try again";
     public static final String STATUS_PREPARING_ONLY_FROM_PENDING_MESSAGE = "Can't change status to preparing if the order is not pending";
+    public static final String STATUS_READY_ONLY_FROM_PREPARING_MESSAGE = "Can't change status to ready if the order is not preparing";
     public static final String ORDER_EMPLOYEE_MISMATCH_MESSAGE = "The order and the user doesn't belong to the same restaurant";
 }

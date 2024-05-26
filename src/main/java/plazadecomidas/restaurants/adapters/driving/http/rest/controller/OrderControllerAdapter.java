@@ -75,6 +75,17 @@ public class OrderControllerAdapter {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("set_ready")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<Void> setReady(@RequestHeader("Authorization") String token, @RequestBody UpdateOrderRequest request) {
+        Long userId = getUserId(token);
+
+        orderServicePort.updateOrderReady(
+                orderRequestMapper.updateOrderRequestToOrder(
+                        request, userId, ControllerConstants.OrderStatus.READY.name()), token);
+
+        return ResponseEntity.ok().build();
+    }
 
     private Long getUserId(String token) {
         String jwt = token.substring(7);

@@ -76,20 +76,38 @@ public class OrderAdapter implements IOrderPersistencePort {
 
     @Override
     public void updateOrderPreparing(Order order) {
-        OrderEntity entity = orderRepository.findById(order.getId()).orElseThrow(
+        OrderEntity registeredOrder = orderRepository.findById(order.getId()).orElseThrow(
                 () -> new RegistryNotFoundException(PersistenceConstants.ORDER_NOT_FOUND_MESSAGE));
 
-        if (!entity.getStatus().equals(DomainConstants.OrderStatus.PENDING.name())) {
+        if (!registeredOrder.getStatus().equals(DomainConstants.OrderStatus.PENDING.name())) {
             throw new WrongConditionsException(PersistenceConstants.STATUS_PREPARING_ONLY_FROM_PENDING_MESSAGE);
         }
 
         Long restaurantId = employeePersistencePort.getRestaurantIdByEmployeeId(order.getIdChef());
-        if (!restaurantId.equals(entity.getRestaurant().getId())) {
+        if (!restaurantId.equals(registeredOrder.getRestaurant().getId())) {
             throw new RegistryMismatchException(PersistenceConstants.ORDER_EMPLOYEE_MISMATCH_MESSAGE);
         }
 
-        entity.setStatus(order.getStatus());
-        entity.setIdChef(order.getIdChef());
-        orderRepository.save(entity);
+        registeredOrder.setStatus(order.getStatus());
+        registeredOrder.setIdChef(order.getIdChef());
+        orderRepository.save(registeredOrder);
+    }
+
+    @Override
+    public Order updateOrderReady(Order order) {
+        OrderEntity registeredOrder = orderRepository.findById(order.getId()).orElseThrow(
+                () -> new RegistryNotFoundException(PersistenceConstants.ORDER_NOT_FOUND_MESSAGE));
+
+        if (!registeredOrder.getStatus().equals(DomainConstants.OrderStatus.PREPARING.name())) {
+            throw new WrongConditionsException(PersistenceConstants.STATUS_READY_ONLY_FROM_PREPARING_MESSAGE);
+        }
+
+        Long restaurantId = employeePersistencePort.getRestaurantIdByEmployeeId(order.getIdChef());
+        if (!restaurantId.equals(registeredOrder.getRestaurant().getId())) {
+            throw new RegistryMismatchException(PersistenceConstants.ORDER_EMPLOYEE_MISMATCH_MESSAGE);
+        }
+
+        registeredOrder.setStatus(order.getStatus());
+        return orderEntityMapper.orderEntityToOrder(orderRepository.save(registeredOrder));
     }
 }

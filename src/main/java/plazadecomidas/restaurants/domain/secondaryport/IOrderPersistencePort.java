@@ -12,4 +12,6 @@ public interface IOrderPersistencePort {
     List<Order> getOrdersByStatus(Long userId, Integer page, Integer size, String status);
 
     void updateOrderPreparing(Order order);
+
+    Order updateOrderReady(Order order);
 }
