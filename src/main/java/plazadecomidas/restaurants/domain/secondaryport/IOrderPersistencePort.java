@@ -16,4 +16,6 @@ public interface IOrderPersistencePort {
     Order updateOrderReady(Order order);
 
     void updateOrderDelivered(Order order);
+
+    boolean tryCancelOrder(Order order);
 }

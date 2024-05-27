@@ -1,5 +1,6 @@
 package plazadecomidas.restaurants.domain.primaryport;
 
+import plazadecomidas.restaurants.domain.model.OperationResult;
 import plazadecomidas.restaurants.domain.model.Order;
 
 import java.util.List;
@@ -14,4 +15,6 @@ public interface IOrderServicePort {
     void updateOrderReady(Order order, String token);
 
     void updateOrderDelivered(Order order);
+
+    OperationResult updateOrderCancelled(Order order);
 }

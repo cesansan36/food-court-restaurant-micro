@@ -27,7 +27,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -364,6 +366,65 @@ class OrderAdapterTest {
         assertAll(
             () -> verify(orderRepository, times(1)).findById(anyLong()),
             () -> verify(orderRepository, times(0)).save(any(OrderEntity.class))
+        );
+    }
+
+    @Test
+    void tryCancelOrderSuccess() {
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
+
+        assertTrue(orderAdapter.tryCancelOrder(order));
+
+        assertAll(
+            () -> verify(orderRepository, times(1)).findById(anyLong()),
+            () -> verify(orderRepository, times(1)).save(any(OrderEntity.class))
+        );
+    }
+
+    @Test
+    void tryCancelOrderFailsBecauseStatusNotPending() {
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+        orderEntity.setStatus(DomainConstants.OrderStatus.READY.name());
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
+
+        assertFalse(orderAdapter.tryCancelOrder(order));
+
+        assertAll(
+                () -> verify(orderRepository, times(1)).findById(anyLong()),
+                () -> verify(orderRepository, times(0)).save(any(OrderEntity.class))
+        );
+    }
+    @Test
+    void tryCancelOrderFailsBecauseClientOrderMismatch() {
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+        orderEntity.setIdClient(2L);
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
+
+        assertThrows(RegistryMismatchException.class, () -> orderAdapter.tryCancelOrder(order));
+
+        assertAll(
+                () -> verify(orderRepository, times(1)).findById(anyLong()),
+                () -> verify(orderRepository, times(0)).save(any(OrderEntity.class))
+        );
+    }
+    @Test
+    void tryCancelOrderFailsBecauseOrderNotFound() {
+        Order order = DomainTestData.getValidOrder(1L);
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(RegistryNotFoundException.class, () -> orderAdapter.tryCancelOrder(order));
+
+        assertAll(
+                () -> verify(orderRepository, times(1)).findById(anyLong()),
+                () -> verify(orderRepository, times(0)).save(any(OrderEntity.class))
         );
     }
 }

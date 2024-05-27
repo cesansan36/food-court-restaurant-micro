@@ -3,6 +3,7 @@ package plazadecomidas.restaurants.adapters.driven.jpa.mysql.util;
 public class PersistenceConstants {
 
 
+
     private PersistenceConstants() {throw new IllegalStateException("Utility class");}
 
     public static final String ALL_STATUS_FILTER = "ALL";
@@ -19,4 +20,5 @@ public class PersistenceConstants {
     public static final String STATUS_DELIVERED_ONLY_FROM_READY_MESSAGE = "Can't change status to delivered if the order is not ready";
     public static final String ORDER_EMPLOYEE_MISMATCH_MESSAGE = "The order and the user doesn't belong to the same restaurant";
     public static final String WRONG_SECURITY_PIN_MESSAGE = "The Security PIN you are trying to use is not valid. Please, try again";
+    public static final String ORDER_CLIENT_MISMATCH_MESSAGE = "The order doesn't belong to the user";
 }

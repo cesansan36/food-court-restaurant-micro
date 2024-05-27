@@ -56,7 +56,7 @@ class OrderTest {
                 Arguments.of(1L, 1L, LocalDate.now(), "PREPARING", 1111, null, 1L, List.of(mock(MealOrder.class), mock(MealOrder.class))),
                 Arguments.of(1L, 1L, LocalDate.now(), "READY", 1111, null, 1L, List.of(mock(MealOrder.class), mock(MealOrder.class))),
                 Arguments.of(1L, 1L, LocalDate.now(), "DELIVERED", 1111, null, 1L, List.of(mock(MealOrder.class), mock(MealOrder.class))),
-                Arguments.of(1L, 1L, LocalDate.now(), "CANCELED", 1111, null, 1L, List.of(mock(MealOrder.class), mock(MealOrder.class)))
+                Arguments.of(1L, 1L, LocalDate.now(), "CANCELLED", 1111, null, 1L, List.of(mock(MealOrder.class), mock(MealOrder.class)))
         );
     }
 

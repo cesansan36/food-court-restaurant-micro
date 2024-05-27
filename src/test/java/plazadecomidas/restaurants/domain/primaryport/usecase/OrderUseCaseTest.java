@@ -2,9 +2,12 @@ package plazadecomidas.restaurants.domain.primaryport.usecase;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
 import plazadecomidas.restaurants.domain.exception.ClientHasUnfinishedOrdersException;
+import plazadecomidas.restaurants.domain.model.OperationResult;
 import plazadecomidas.restaurants.domain.model.Order;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderMessagingPort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderPersistencePort;
@@ -124,5 +127,33 @@ class OrderUseCaseTest {
         orderUseCase.updateOrderDelivered(order);
 
         verify(orderPersistencePort, times(1)).updateOrderDelivered(order);
+    }
+
+    @Test
+    void updateOrderCancelledSuccess(){
+        boolean result = true;
+        String message = "The order was cancelled successfully";
+        Order order = mock(Order.class);
+
+        when(orderPersistencePort.tryCancelOrder(order)).thenReturn(result);
+
+        OperationResult operationResult = orderUseCase.updateOrderCancelled(order);
+
+        assertEquals(result, operationResult.isSuccess());
+        assertEquals(message, operationResult.getMessage());
+    }
+
+    @Test
+    void updateOrderCancelledFail(){
+        boolean result = false;
+        String message = "Lo sentimos, tu pedido ya está en preparación y no puede cancelarse";
+        Order order = mock(Order.class);
+
+        when(orderPersistencePort.tryCancelOrder(order)).thenReturn(result);
+
+        OperationResult operationResult = orderUseCase.updateOrderCancelled(order);
+
+        assertEquals(result, operationResult.isSuccess());
+        assertEquals(message, operationResult.getMessage());
     }
 }

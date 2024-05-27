@@ -128,4 +128,23 @@ public class OrderAdapter implements IOrderPersistencePort {
         registeredOrder.setStatus(order.getStatus());
         orderRepository.save(registeredOrder);
     }
+
+    @Override
+    public boolean tryCancelOrder(Order order) {
+
+        OrderEntity registeredOrder = orderRepository.findById(order.getId()).orElseThrow(
+                () -> new RegistryNotFoundException(PersistenceConstants.ORDER_NOT_FOUND_MESSAGE));
+
+        if(!order.getIdClient().equals(registeredOrder.getIdClient())) {
+            throw new RegistryMismatchException(PersistenceConstants.ORDER_CLIENT_MISMATCH_MESSAGE);
+        }
+
+        if (!registeredOrder.getStatus().equals(DomainConstants.OrderStatus.PENDING.name())) {
+            return false;
+        }
+
+        registeredOrder.setStatus(DomainConstants.OrderStatus.CANCELLED.name());
+        orderRepository.save(registeredOrder);
+        return true;
+    }
 }

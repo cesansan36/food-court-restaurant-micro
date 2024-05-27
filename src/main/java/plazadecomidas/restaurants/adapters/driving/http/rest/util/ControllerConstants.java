@@ -11,7 +11,7 @@ public class ControllerConstants {
         PREPARING,
         READY,
         DELIVERED,
-        CANCELED
+        CANCELLED
     }
 
     public static final String OWNER_ID_MISMATCH_MESSAGE = "The id of the owner sent doesn't match the id of the person using the module";

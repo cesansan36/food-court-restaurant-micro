@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddOrderRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateOrderRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateOrderToDeliveredRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.response.OrderCancelledResponse;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.response.OrderResponse;
+import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderCancelledResponseMapper;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderRequestMapper;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderResponseMapper;
 import plazadecomidas.restaurants.adapters.driving.http.rest.util.ControllerConstants;
@@ -32,6 +34,7 @@ public class OrderControllerAdapter {
     private final IOrderServicePort orderServicePort;
     private final IOrderRequestMapper orderRequestMapper;
     private final IOrderResponseMapper orderResponseMapper;
+    private final IOrderCancelledResponseMapper orderCancelledResponseMapper;
     private final ITokenUtils tokenUtils;
 
     @PostMapping("register")
@@ -44,6 +47,23 @@ public class OrderControllerAdapter {
                         addOrderRequest, userId, ControllerConstants.OrderStatus.PENDING.toString()));
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PutMapping("cancel")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<String> cancelOrder(@RequestHeader("Authorization") String token, @RequestBody UpdateOrderRequest request) {
+        Long userId = getUserId(token);
+
+        OrderCancelledResponse result = orderCancelledResponseMapper.toCancelledResponse(
+                orderServicePort.updateOrderCancelled(
+                orderRequestMapper.updateOrderCancelledRequestToOrder(
+                        request, userId, ControllerConstants.OrderStatus.CANCELLED.name())));
+
+        if (result.success()) {
+            return ResponseEntity.ok(result.message());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.message());
+        }
     }
 
     @GetMapping("list")

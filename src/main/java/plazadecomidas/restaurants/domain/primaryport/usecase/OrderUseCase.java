@@ -2,6 +2,7 @@ package plazadecomidas.restaurants.domain.primaryport.usecase;
 
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
 import plazadecomidas.restaurants.domain.exception.ClientHasUnfinishedOrdersException;
+import plazadecomidas.restaurants.domain.model.OperationResult;
 import plazadecomidas.restaurants.domain.model.Order;
 import plazadecomidas.restaurants.domain.primaryport.IOrderServicePort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderMessagingPort;
@@ -79,5 +80,16 @@ public class OrderUseCase implements IOrderServicePort {
     @Override
     public void updateOrderDelivered(Order order) {
         orderPersistencePort.updateOrderDelivered(order);
+    }
+
+    @Override
+    public OperationResult updateOrderCancelled(Order order) {
+        boolean result = orderPersistencePort.tryCancelOrder(order);
+
+        if (result) {
+            return new OperationResult(true, DomainConstants.ORDER_CANCELLED_SUCCESS_MESSAGE);
+        } else {
+            return new OperationResult(false, DomainConstants.ORDER_CANCELLED_FAILED_MESSAGE);
+        }
     }
 }

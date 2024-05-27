@@ -2,6 +2,7 @@ package plazadecomidas.restaurants.domain.util;
 
 public class DomainConstants {
 
+
     private DomainConstants() {
         throw new IllegalStateException("Utility class");
     }
@@ -38,7 +39,7 @@ public class DomainConstants {
         PREPARING,
         READY,
         DELIVERED,
-        CANCELED;
+        CANCELLED;
 
         public static boolean isValidStatus(String status) {
             for (OrderStatus orderStatus : OrderStatus.values()) {
@@ -69,4 +70,6 @@ public class DomainConstants {
     public static final String CLIENT_HAS_UNFINISHED_ORDERS_MESSAGE = "Client has unfinished orders";
     public static final String WRONG_STATUS_MESSAGE = "The status used is not a valid status";
     public static final String QUANTITY_NEGATIVE_MESSAGE = "The quantity must be greater than 0";
+    public static final String ORDER_CANCELLED_SUCCESS_MESSAGE = "The order was cancelled successfully";
+    public static final String ORDER_CANCELLED_FAILED_MESSAGE = "Lo sentimos, tu pedido ya está en preparación y no puede cancelarse";
 }

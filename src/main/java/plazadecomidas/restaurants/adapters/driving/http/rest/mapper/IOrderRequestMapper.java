@@ -66,4 +66,14 @@ public interface IOrderRequestMapper {
     default List<MealOrder> dummyMealsList2(UpdateOrderToDeliveredRequest request) {
         return new ArrayList<>();
     }
+
+    @Mapping(target = "id", source = "request.id")
+    @Mapping(target = "idClient", source = "userId")
+    @Mapping(target = "idChef", constant = "0L")
+    @Mapping(target = "idRestaurant", constant = "0L")
+    @Mapping(target = "meals", source = "request", qualifiedByName = "dummyMealsList")
+    @Mapping(target = "status", source = "status")
+    @Mapping(target = "securityPin", constant = "0")
+    @Mapping(target = "date", expression = "java(java.time.LocalDate.now())")
+    Order updateOrderCancelledRequestToOrder(UpdateOrderRequest request, Long userId, String status);
 }

@@ -2,7 +2,6 @@ package plazadecomidas.restaurants.adapters.driving.http.rest.controller;
 
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import plazadecomidas.restaurants.TestData.ControllerTestData;
@@ -18,15 +18,19 @@ import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddOrderRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateOrderRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateOrderToDeliveredRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.response.OrderCancelledResponse;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.response.OrderResponse;
+import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderCancelledResponseMapper;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderRequestMapper;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderResponseMapper;
+import plazadecomidas.restaurants.domain.model.OperationResult;
 import plazadecomidas.restaurants.domain.model.Order;
 import plazadecomidas.restaurants.domain.primaryport.IOrderServicePort;
 import plazadecomidas.restaurants.util.ITokenUtils;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -49,6 +53,7 @@ class OrderControllerAdapterTest {
     private IOrderServicePort orderServicePort;
     private IOrderRequestMapper orderRequestMapper;
     private IOrderResponseMapper orderResponseMapper;
+    private IOrderCancelledResponseMapper orderCancelledResponseMapper;
     private ITokenUtils tokenUtils;
 
     private MockMvc mockMvc;
@@ -58,9 +63,10 @@ class OrderControllerAdapterTest {
 
         orderServicePort = mock(IOrderServicePort.class);
         orderRequestMapper = mock(IOrderRequestMapper.class);
+        orderCancelledResponseMapper = mock(IOrderCancelledResponseMapper.class);
         orderResponseMapper = mock(IOrderResponseMapper.class);
         tokenUtils = mock(ITokenUtils.class);
-        orderControllerAdapter = new OrderControllerAdapter(orderServicePort, orderRequestMapper, orderResponseMapper, tokenUtils);
+        orderControllerAdapter = new OrderControllerAdapter(orderServicePort, orderRequestMapper, orderResponseMapper, orderCancelledResponseMapper, tokenUtils);
         mockMvc = MockMvcBuilders.standaloneSetup(orderControllerAdapter).build();
     }
 
@@ -222,5 +228,87 @@ class OrderControllerAdapterTest {
 
         verify(orderRequestMapper, times(1)).updateOrderToDeliveredRequestToOrder(any(UpdateOrderToDeliveredRequest.class), anyString());
         verify(orderServicePort, times(1)).updateOrderDelivered(any(Order.class));
+    }
+
+    @Test
+    void cancelOrderSuccess() throws Exception {
+        Object inputObject = new Object() {
+            public final Long id = 1L;
+        };
+        ObjectMapper objectMapper = new ObjectMapper();
+        String inputJson = objectMapper.writeValueAsString(inputObject);
+
+        String bearerToken = "Bearer 123456789";
+        Claim claim = ControllerTestData.getIdClaim(1L);
+        Order order = DomainTestData.getValidOrder(1L);
+        OperationResult operationResult = new OperationResult(true, "Order cancelled successfully");
+        OrderCancelledResponse operationResponse = new OrderCancelledResponse(operationResult.isSuccess(), operationResult.getMessage());
+
+        when(tokenUtils.validateToken(anyString())).thenReturn(mock(DecodedJWT.class));
+        when(tokenUtils.getSpecificClaim(any(DecodedJWT.class), anyString())).thenReturn(claim);
+        when(orderRequestMapper.updateOrderCancelledRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString())).thenReturn(order);
+        when(orderServicePort.updateOrderCancelled(any(Order.class))).thenReturn(operationResult);
+        when(orderCancelledResponseMapper.toCancelledResponse(any(OperationResult.class))).thenReturn(operationResponse);
+
+        MockHttpServletRequestBuilder request = put("/orders/cancel")
+                .header(HttpHeaders.AUTHORIZATION, bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(inputJson);
+
+        MvcResult result = mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+
+        verify(tokenUtils, times(1)).getSpecificClaim(any(DecodedJWT.class), anyString());
+        verify(tokenUtils, times(1)).validateToken(anyString());
+        verify(orderRequestMapper, times(1)).updateOrderCancelledRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString());
+        verify(orderServicePort, times(1)).updateOrderCancelled(any(Order.class));
+        verify(orderCancelledResponseMapper, times(1)).toCancelledResponse(any(OperationResult.class));
+
+        String response = result.getResponse().getContentAsString();
+        assertEquals(operationResponse.message(), response);
+    }
+
+    @Test
+    void cancelOrderFailure() throws Exception {
+        Object inputObject = new Object() {
+            public final Long id = 1L;
+        };
+        ObjectMapper objectMapper = new ObjectMapper();
+        String inputJson = objectMapper.writeValueAsString(inputObject);
+
+        String bearerToken = "Bearer 123456789";
+        Claim claim = ControllerTestData.getIdClaim(1L);
+        Order order = DomainTestData.getValidOrder(1L);
+        OperationResult operationResult = new OperationResult(false, "Order cancellation failed");
+        OrderCancelledResponse operationResponse = new OrderCancelledResponse(operationResult.isSuccess(), operationResult.getMessage());
+
+        when(tokenUtils.validateToken(anyString())).thenReturn(mock(DecodedJWT.class));
+        when(tokenUtils.getSpecificClaim(any(DecodedJWT.class), anyString())).thenReturn(claim);
+        when(orderRequestMapper.updateOrderCancelledRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString())).thenReturn(order);
+        when(orderServicePort.updateOrderCancelled(any(Order.class))).thenReturn(operationResult);
+        when(orderCancelledResponseMapper.toCancelledResponse(any(OperationResult.class))).thenReturn(operationResponse);
+
+        MockHttpServletRequestBuilder request = put("/orders/cancel")
+                .header(HttpHeaders.AUTHORIZATION, bearerToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(inputJson);
+
+        MvcResult result = mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+
+        verify(tokenUtils, times(1)).getSpecificClaim(any(DecodedJWT.class), anyString());
+        verify(tokenUtils, times(1)).validateToken(anyString());
+        verify(orderRequestMapper, times(1)).updateOrderCancelledRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString());
+        verify(orderServicePort, times(1)).updateOrderCancelled(any(Order.class));
+        verify(orderCancelledResponseMapper, times(1)).toCancelledResponse(any(OperationResult.class));
+
+        String response = result.getResponse().getContentAsString();
+        assertEquals(operationResponse.message(), response);
     }
 }
