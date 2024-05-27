@@ -12,4 +12,6 @@ public interface IOrderServicePort {
     void updateOrderPreparing(Order order);
 
     void updateOrderReady(Order order, String token);
+
+    void updateOrderDelivered(Order order);
 }

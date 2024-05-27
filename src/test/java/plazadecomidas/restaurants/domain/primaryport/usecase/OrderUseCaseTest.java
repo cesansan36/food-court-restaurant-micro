@@ -116,4 +116,13 @@ class OrderUseCaseTest {
         verify(orderPersistencePort, times(1)).updateOrderReady(order);
         verify(orderMessagingPort, times(0)).sendOrderReadyMessage(token, order, phoneNumber);
     }
+
+    @Test
+    void updateOrderDelivered() {
+        Order order = DomainTestData.getValidOrder(1L);
+
+        orderUseCase.updateOrderDelivered(order);
+
+        verify(orderPersistencePort, times(1)).updateOrderDelivered(order);
+    }
 }

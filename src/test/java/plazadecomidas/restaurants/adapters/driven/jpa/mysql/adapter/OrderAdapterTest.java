@@ -274,7 +274,7 @@ class OrderAdapterTest {
     void updateOrderReadyFailBecauseStatusNotPreparing() {
         Order order = DomainTestData.getValidOrder(1L);
         OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
-        orderEntity.setStatus(DomainConstants.OrderStatus.DELIVERED.name());
+        orderEntity.setStatus(DomainConstants.OrderStatus.PENDING.name());
 
         when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
 
@@ -301,6 +301,69 @@ class OrderAdapterTest {
             () -> verify(orderRepository, times(0)).save(any(OrderEntity.class)),
             () -> verify(employeePersistencePort, times(0)).getRestaurantIdByEmployeeId(anyLong()),
             () -> verify(orderEntityMapper, times(0)).orderEntityToOrder(any(OrderEntity.class))
+        );
+    }
+
+    @Test
+    void updateOrderDeliveredSuccess() {
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+        orderEntity.setStatus(DomainConstants.OrderStatus.READY.name());
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
+
+        orderAdapter.updateOrderDelivered(order);
+
+        assertAll(
+            () -> verify(orderRepository, times(1)).findById(anyLong()),
+            () -> verify(orderRepository, times(1)).save(any(OrderEntity.class))
+        );
+    }
+
+    @Test
+    void updateOrderDeliveredFailBecauseOrderNotFound() {
+        Order order = DomainTestData.getValidOrder(1L);
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        assertThrows(RegistryNotFoundException.class, () -> orderAdapter.updateOrderDelivered(order));
+
+        assertAll(
+            () -> verify(orderRepository, times(1)).findById(anyLong()),
+            () -> verify(orderRepository, times(0)).save(any(OrderEntity.class))
+        );
+    }
+
+    @Test
+    void updateOrderDeliveredFailBecauseWrongSecurityPin() {
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+        orderEntity.setStatus(DomainConstants.OrderStatus.READY.name());
+        orderEntity.setSecurityPin(3333);
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
+
+        assertThrows(WrongInputException.class, () -> orderAdapter.updateOrderDelivered(order));
+
+        assertAll(
+            () -> verify(orderRepository, times(1)).findById(anyLong()),
+            () -> verify(orderRepository, times(0)).save(any(OrderEntity.class))
+        );
+    }
+
+    @Test
+    void updateOrderDeliveredFailBecauseStatusNotReady() {
+        Order order = DomainTestData.getValidOrder(1L);
+        OrderEntity orderEntity = PersistenceTestData.getValidOrderEntity(1L);
+        orderEntity.setStatus(DomainConstants.OrderStatus.PENDING.name());
+
+        when(orderRepository.findById(anyLong())).thenReturn(Optional.of(orderEntity));
+
+        assertThrows(WrongConditionsException.class, () -> orderAdapter.updateOrderDelivered(order));
+
+        assertAll(
+            () -> verify(orderRepository, times(1)).findById(anyLong()),
+            () -> verify(orderRepository, times(0)).save(any(OrderEntity.class))
         );
     }
 }

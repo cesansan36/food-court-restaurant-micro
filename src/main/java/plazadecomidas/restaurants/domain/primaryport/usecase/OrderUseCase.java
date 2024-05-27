@@ -17,7 +17,7 @@ public class OrderUseCase implements IOrderServicePort {
     private final IOrderPersistencePort orderPersistencePort;
     private final IUserConnectionPort userConnectionPort;
     private final IOrderMessagingPort orderMessagingPort;
-    private Random random;
+    private final Random random;
 
     public OrderUseCase(IOrderPersistencePort orderPersistencePort, IUserConnectionPort userConnectionPort, IOrderMessagingPort orderMessagingPort) {
         this.orderPersistencePort = orderPersistencePort;
@@ -74,5 +74,10 @@ public class OrderUseCase implements IOrderServicePort {
         }
 
         orderMessagingPort.sendOrderReadyMessage(token, updatedOrder, phoneNumber);
+    }
+
+    @Override
+    public void updateOrderDelivered(Order order) {
+        orderPersistencePort.updateOrderDelivered(order);
     }
 }

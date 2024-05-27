@@ -98,8 +98,9 @@ public class OrderAdapter implements IOrderPersistencePort {
         OrderEntity registeredOrder = orderRepository.findById(order.getId()).orElseThrow(
                 () -> new RegistryNotFoundException(PersistenceConstants.ORDER_NOT_FOUND_MESSAGE));
 
-        if (!registeredOrder.getStatus().equals(DomainConstants.OrderStatus.PREPARING.name())) {
-            throw new WrongConditionsException(PersistenceConstants.STATUS_READY_ONLY_FROM_PREPARING_MESSAGE);
+        if (!registeredOrder.getStatus().equals(DomainConstants.OrderStatus.PREPARING.name())
+                && !registeredOrder.getStatus().equals(DomainConstants.OrderStatus.DELIVERED.name())) {
+            throw new WrongConditionsException(PersistenceConstants.STATUS_READY_ONLY_FROM_PREPARING_OR_DELIVERED_MESSAGE);
         }
 
         Long restaurantId = employeePersistencePort.getRestaurantIdByEmployeeId(order.getIdChef());
@@ -109,5 +110,22 @@ public class OrderAdapter implements IOrderPersistencePort {
 
         registeredOrder.setStatus(order.getStatus());
         return orderEntityMapper.orderEntityToOrder(orderRepository.save(registeredOrder));
+    }
+
+    @Override
+    public void updateOrderDelivered(Order order) {
+        OrderEntity registeredOrder = orderRepository.findById(order.getId()).orElseThrow(
+                () -> new RegistryNotFoundException(PersistenceConstants.ORDER_NOT_FOUND_MESSAGE));
+
+        if(!order.getSecurityPin().equals(registeredOrder.getSecurityPin())) {
+            throw new WrongInputException(PersistenceConstants.WRONG_SECURITY_PIN_MESSAGE);
+        }
+
+        if (!registeredOrder.getStatus().equals(DomainConstants.OrderStatus.READY.name())) {
+            throw new WrongConditionsException(PersistenceConstants.STATUS_DELIVERED_ONLY_FROM_READY_MESSAGE);
+        }
+
+        registeredOrder.setStatus(order.getStatus());
+        orderRepository.save(registeredOrder);
     }
 }

@@ -17,6 +17,7 @@ import plazadecomidas.restaurants.TestData.ControllerTestData;
 import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddOrderRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateOrderRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateOrderToDeliveredRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.response.OrderResponse;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderRequestMapper;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderResponseMapper;
@@ -195,5 +196,31 @@ class OrderControllerAdapterTest {
         verify(tokenUtils, times(1)).validateToken(anyString());
         verify(orderRequestMapper, times(1)).updateOrderRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString());
         verify(orderServicePort, times(1)).updateOrderReady(any(Order.class), anyString());
+    }
+
+    @Test
+    void setDelivered() throws Exception {
+
+        Object inputObject = new Object() {
+            public final Long id = 1L;
+            public final Integer securityPin = 1234;
+        };
+        ObjectMapper objectMapper = new ObjectMapper();
+        String inputJson = objectMapper.writeValueAsString(inputObject);
+
+        Order order = DomainTestData.getValidOrder(1L);
+
+        when(orderRequestMapper.updateOrderToDeliveredRequestToOrder(any(UpdateOrderToDeliveredRequest.class), anyString())).thenReturn(order);
+
+        MockHttpServletRequestBuilder request = put("/orders/set_delivered")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(inputJson);
+
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        verify(orderRequestMapper, times(1)).updateOrderToDeliveredRequestToOrder(any(UpdateOrderToDeliveredRequest.class), anyString());
+        verify(orderServicePort, times(1)).updateOrderDelivered(any(Order.class));
     }
 }

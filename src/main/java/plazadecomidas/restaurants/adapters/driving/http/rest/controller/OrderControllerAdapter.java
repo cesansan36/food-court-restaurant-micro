@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddOrderRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateOrderRequest;
+import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.UpdateOrderToDeliveredRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.response.OrderResponse;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderRequestMapper;
 import plazadecomidas.restaurants.adapters.driving.http.rest.mapper.IOrderResponseMapper;
@@ -83,6 +84,17 @@ public class OrderControllerAdapter {
         orderServicePort.updateOrderReady(
                 orderRequestMapper.updateOrderRequestToOrder(
                         request, userId, ControllerConstants.OrderStatus.READY.name()), token);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("set_delivered")
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    public ResponseEntity<Void> setDelivered(@RequestBody UpdateOrderToDeliveredRequest request) {
+
+        orderServicePort.updateOrderDelivered(
+                orderRequestMapper.updateOrderToDeliveredRequestToOrder(
+                        request, ControllerConstants.OrderStatus.DELIVERED.name()));
 
         return ResponseEntity.ok().build();
     }
