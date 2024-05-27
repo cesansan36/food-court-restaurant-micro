@@ -1,5 +1,6 @@
 package plazadecomidas.restaurants.adapters.driving.http.rest.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class EmployeeControllerAdapter {
 
     @PostMapping("register")
     @PreAuthorize("hasRole('OWNER')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> registerEmployee(@RequestHeader("Authorization") String token, @RequestBody AddEmployeeRequest addEmployeeRequest) {
         Long ownerId = getUserId(token);
 

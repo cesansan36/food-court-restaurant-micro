@@ -29,6 +29,7 @@ public class RestaurantControllerAdapter {
 
     @PostMapping("register/restaurant")
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> addRestaurant(@RequestBody AddRestaurantRequest addRestaurantRequest) {
 
         restaurantServicePort.saveRestaurant(

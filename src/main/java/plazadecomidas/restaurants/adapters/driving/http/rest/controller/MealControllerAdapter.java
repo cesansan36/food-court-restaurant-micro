@@ -1,5 +1,6 @@
 package plazadecomidas.restaurants.adapters.driving.http.rest.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,7 @@ public class MealControllerAdapter {
 
     @PostMapping("register")
     @PreAuthorize("hasRole('OWNER')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> addMeal(@RequestHeader("Authorization") String token, @RequestBody AddMealRequest addMealRequest) {
         Long userId = getUserId(token);
         Meal meal = mealRequestMapper.addMealRequestToMeal(addMealRequest);
@@ -47,6 +49,7 @@ public class MealControllerAdapter {
 
     @PutMapping("update")
     @PreAuthorize("hasRole('OWNER')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> updateMeal(@RequestHeader("Authorization") String token, @RequestBody UpdateMealRequest updateMealRequest) {
         Long userId = getUserId(token);
         Meal meal = mealRequestMapper.updateMealRequestToMeal(updateMealRequest);
@@ -57,6 +60,7 @@ public class MealControllerAdapter {
 
     @PutMapping("set-availability")
     @PreAuthorize("hasRole('OWNER')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> setAvailability(@RequestHeader("Authorization") String token,
                                                 @RequestBody UpdateMealAvailabilityRequest updateMealRequest) {
         Long userId = getUserId(token);
@@ -68,6 +72,7 @@ public class MealControllerAdapter {
 
     @GetMapping("list")
     @PreAuthorize("hasRole('CLIENT')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<MealResponse>> listMeals(@RequestParam Long restaurantId) {
 
         List<MealResponse> results = mealResponseMapper.mealsToMealResponses(mealServicePort.getMealsOfRestaurant(restaurantId));

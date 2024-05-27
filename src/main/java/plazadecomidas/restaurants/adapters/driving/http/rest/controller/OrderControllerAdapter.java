@@ -1,5 +1,6 @@
 package plazadecomidas.restaurants.adapters.driving.http.rest.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,7 @@ public class OrderControllerAdapter {
 
     @PostMapping("register")
     @PreAuthorize("hasRole('CLIENT')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> registerOrder(@RequestHeader("Authorization") String token, @RequestBody AddOrderRequest addOrderRequest) {
         Long userId = getUserId(token);
 
@@ -51,6 +53,7 @@ public class OrderControllerAdapter {
 
     @PutMapping("cancel")
     @PreAuthorize("hasRole('CLIENT')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<String> cancelOrder(@RequestHeader("Authorization") String token, @RequestBody UpdateOrderRequest request) {
         Long userId = getUserId(token);
 
@@ -68,6 +71,7 @@ public class OrderControllerAdapter {
 
     @GetMapping("list")
     @PreAuthorize("hasRole('EMPLOYEE')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<OrderResponse>> listOrders(
                                 @RequestHeader("Authorization") String token,
                                 @RequestParam(defaultValue = "0") Integer page,
@@ -86,6 +90,7 @@ public class OrderControllerAdapter {
 
     @PutMapping("assign_chef")
     @PreAuthorize("hasRole('EMPLOYEE')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> assignChef(@RequestHeader("Authorization") String token, @RequestBody UpdateOrderRequest request) {
         Long userId = getUserId(token);
 
@@ -98,6 +103,7 @@ public class OrderControllerAdapter {
 
     @PutMapping("set_ready")
     @PreAuthorize("hasRole('EMPLOYEE')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> setReady(@RequestHeader("Authorization") String token, @RequestBody UpdateOrderRequest request) {
         Long userId = getUserId(token);
 
@@ -110,6 +116,7 @@ public class OrderControllerAdapter {
 
     @PutMapping("set_delivered")
     @PreAuthorize("hasRole('EMPLOYEE')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Void> setDelivered(@RequestBody UpdateOrderToDeliveredRequest request) {
 
         orderServicePort.updateOrderDelivered(
