@@ -41,6 +41,6 @@ public class DomainTestData {
     }
 
     public static Order getValidOrder (Long id) {
-        return new Order(id, id, LocalDate.now(), "PENDING", id, id, List.of(getValidMealOrder(id)));
+        return new Order(id, id, LocalDate.now(), "PENDING", 1111, id, id, List.of(getValidMealOrder(id)));
     }
 }

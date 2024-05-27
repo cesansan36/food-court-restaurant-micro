@@ -57,6 +57,7 @@ public class PersistenceTestData {
             id,
             LocalDate.now(),
             DomainTestData.STATUS,
+            1111,
             id,
             getValidRestaurantEntity(id, id),
             List.of(getValidOrderMealEntity(id))

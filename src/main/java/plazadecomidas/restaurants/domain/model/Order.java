@@ -14,11 +14,12 @@ public class Order {
     private final Long idClient;
     private final LocalDate date;
     private final String status;
+    private final Integer securityPin;
     private final Long idChef;
     private final Long idRestaurant;
     private final List<MealOrder> meals;
 
-    public Order(Long id, Long idClient, LocalDate date, String status, Long idChef, Long idRestaurant, List<MealOrder> meals) {
+    public Order(Long id, Long idClient, LocalDate date, String status, Integer securityPin, Long idChef, Long idRestaurant, List<MealOrder> meals) {
 
         validateFields(idClient, date, status, idRestaurant, meals);
 
@@ -28,6 +29,7 @@ public class Order {
         this.idClient = idClient;
         this.date = date;
         this.status = status;
+        this.securityPin = securityPin;
         this.idChef = idChef;
         this.idRestaurant = idRestaurant;
         this.meals = meals;
@@ -68,5 +70,9 @@ public class Order {
 
     public List<MealOrder> getMeals() {
         return meals;
+    }
+
+    public Integer getSecurityPin() {
+        return securityPin;
     }
 }

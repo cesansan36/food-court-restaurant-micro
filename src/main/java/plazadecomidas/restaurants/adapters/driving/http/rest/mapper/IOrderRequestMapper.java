@@ -19,6 +19,7 @@ public interface IOrderRequestMapper {
     @Mapping(target = "idClient", source = "userId")
     @Mapping(target = "date", expression = "java(java.time.LocalDate.now())")
     @Mapping(target = "status", source = "orderStatus")
+    @Mapping(target = "securityPin", constant = "0")
     @Mapping(target = "idChef", ignore = true)
     @Mapping(target = "idRestaurant", source = "addOrderRequest.restaurantId")
     @Mapping(target = "meals", source = "addOrderRequest", qualifiedByName = "mapMeals")
@@ -42,6 +43,7 @@ public interface IOrderRequestMapper {
     @Mapping(target = "idRestaurant", constant = "0L")
     @Mapping(target = "meals", source = "request", qualifiedByName = "dummyMealsList")
     @Mapping(target = "status", source = "status")
+    @Mapping(target = "securityPin", constant = "0")
     @Mapping(target = "date", expression = "java(java.time.LocalDate.now())")
     Order updateOrderRequestToOrder(UpdateOrderRequest request, Long userId, String status);
 

@@ -10,17 +10,21 @@ import plazadecomidas.restaurants.domain.secondaryport.IUserConnectionPort;
 import plazadecomidas.restaurants.domain.util.DomainConstants;
 
 import java.util.List;
+import java.util.Random;
 
 public class OrderUseCase implements IOrderServicePort {
 
     private final IOrderPersistencePort orderPersistencePort;
     private final IUserConnectionPort userConnectionPort;
     private final IOrderMessagingPort orderMessagingPort;
+    private Random random;
 
     public OrderUseCase(IOrderPersistencePort orderPersistencePort, IUserConnectionPort userConnectionPort, IOrderMessagingPort orderMessagingPort) {
         this.orderPersistencePort = orderPersistencePort;
         this.userConnectionPort = userConnectionPort;
         this.orderMessagingPort = orderMessagingPort;
+
+        random = new Random();
     }
 
     @Override
@@ -31,7 +35,20 @@ public class OrderUseCase implements IOrderServicePort {
             throw new ClientHasUnfinishedOrdersException(DomainConstants.CLIENT_HAS_UNFINISHED_ORDERS_MESSAGE);
         }
 
-        orderPersistencePort.saveOrder(order);
+        Integer securityPin = random.nextInt(9000) + 1000;
+
+        Order orderWithPin = new Order(
+                order.getId(),
+                order.getIdClient(),
+                order.getDate(),
+                order.getStatus(),
+                securityPin,
+                order.getIdChef(),
+                order.getIdRestaurant(),
+                order.getMeals()
+        );
+
+        orderPersistencePort.saveOrder(orderWithPin);
     }
 
     @Override

@@ -37,6 +37,9 @@ public class OrderEntity {
     private LocalDate date;
     private String status;
 
+    @Column(name = "security_pin")
+    private Integer securityPin;
+
     @Column(name = "id_chef")
     private Long idChef;
 

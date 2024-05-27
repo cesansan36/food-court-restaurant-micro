@@ -16,6 +16,6 @@ public interface ISendMessageRequestMapper {
     @Named("mapMessage")
     default String mapMessage(Order order) {
 
-        return "Your order with id " + order.getId() + " is ready";
+        return "Your order with id " + order.getId() + " is ready. This is your security pin: " + order.getSecurityPin();
     }
 }
