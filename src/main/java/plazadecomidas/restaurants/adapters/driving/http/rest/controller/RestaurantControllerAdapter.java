@@ -1,5 +1,6 @@
 package plazadecomidas.restaurants.adapters.driving.http.rest.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,7 @@ public class RestaurantControllerAdapter {
 
     @GetMapping("list")
     @PreAuthorize("hasRole('CLIENT')")
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<List<RestaurantResponse>> listRestaurants() {
 
         List<RestaurantResponse> restaurants = restaurantResponseMapper.restaurantsToRestaurantResponses(
