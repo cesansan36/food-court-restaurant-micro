@@ -1,5 +1,7 @@
 package plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +16,14 @@ public interface IMealRepository extends JpaRepository<MealEntity, Long> {
     Optional<MealEntity> findByNameAndRestaurant_Id(String name, Long restaurantId);
 
     List<MealEntity> findByActiveTrueAndRestaurantId(Long restaurantId);
+
+    @Query("SELECT m FROM MealEntity m " +
+            "WHERE m.restaurant.id = :restaurantId " +
+            "AND m.category.id = :categoryId " +
+            "AND m.active = true")
+    Page<MealEntity> findActiveMealsByRestaurantAndCategory(Long restaurantId, Long categoryId, Pageable pageable);
+
+    // Page<OrderEntity> findAllByRestaurantIdAndStatus(Pageable pageable, Long restaurantId, String status);
 
     List<Long> findAllRestaurantIdsByIdIn(List<Long> ids);
 

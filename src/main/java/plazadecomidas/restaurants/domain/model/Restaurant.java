@@ -62,7 +62,7 @@ public class Restaurant {
             throw new FieldRuleInvalidException(DomainConstants.NAME_INVALID_MESSAGE);
         }
         if (!Validator.isValidPhoneNumber(phoneNumber)) {
-            throw new FieldRuleInvalidException(DomainConstants.PHONE_NUMBER_CHAR_AMOUNT_EXCEEDED);
+            throw new FieldRuleInvalidException(DomainConstants.PHONE_NUMBER_NOT_VALID_MESSAGE.formatted(DomainConstants.PHONE_NUMBER_MAX_LENGTH));
         }
     }
 

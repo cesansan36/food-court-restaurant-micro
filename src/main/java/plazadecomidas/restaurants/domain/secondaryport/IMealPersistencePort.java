@@ -14,5 +14,7 @@ public interface IMealPersistencePort {
 
     Meal getByNameAndRestaurantId(String name, Long id);
 
-    List<Meal> getMealsOfRestaurant(Long restaurantId);
+    List<Meal> getMealsOfRestaurant(Long restaurantId, Integer page, Integer size, Long idCategory);
+
+    boolean existsCategory(Long idCategory);
 }

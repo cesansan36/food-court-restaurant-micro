@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -41,6 +42,7 @@ class MealUseCaseTest {
         Long idUser = 1L;
 
         when(restaurantPersistencePort.existsRestaurantOwnerPair(anyLong(), anyLong())).thenReturn(true);
+        when(mealPersistencePort.existsCategory(anyLong())).thenReturn(true);
 
         mealUseCase.saveMeal(meal, idUser);
 
@@ -71,6 +73,7 @@ class MealUseCaseTest {
         Long idUser = 1L;
 
         when(restaurantPersistencePort.existsRestaurantOwnerPair(anyLong(), anyLong())).thenReturn(false);
+        when(mealPersistencePort.existsCategory(anyLong())).thenReturn(true);
 
         assertThrows(DataMismatchException.class, () -> mealUseCase.saveMeal(meal, idUser));
 
@@ -100,10 +103,10 @@ class MealUseCaseTest {
         Long idRestaurant = 1L;
         Meal meal = DomainTestData.getValidMeal(1L);
 
-        when(mealPersistencePort.getMealsOfRestaurant(anyLong())).thenReturn(List.of(meal));
+        when(mealPersistencePort.getMealsOfRestaurant(anyLong(), anyInt(), anyInt(), anyLong())).thenReturn(List.of(meal));
 
-        mealUseCase.getMealsOfRestaurant(idRestaurant);
+        mealUseCase.getMealsOfRestaurant(idRestaurant, 0, 10, 1L);
 
-        verify(mealPersistencePort, times(1)).getMealsOfRestaurant(anyLong());
+        verify(mealPersistencePort, times(1)).getMealsOfRestaurant(anyLong(), anyInt(), anyInt(), anyLong());
     }
 }

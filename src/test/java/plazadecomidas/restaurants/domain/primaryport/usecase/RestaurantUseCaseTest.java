@@ -15,6 +15,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -83,11 +84,11 @@ class RestaurantUseCaseTest {
     @DisplayName("Get list of restaurants")
     void getAllRestaurants() {
         List<Restaurant> restaurants = List.of(DomainTestData.getValidRestaurant(1L, 1L));
-        when(restaurantPersistencePort.getAllRestaurants()).thenReturn(restaurants);
+        when(restaurantPersistencePort.getAllRestaurants(anyInt(), anyInt())).thenReturn(restaurants);
 
-        List<Restaurant> result = restaurantUseCase.getAllRestaurants();
+        List<Restaurant> result = restaurantUseCase.getAllRestaurants(1, 1);
 
         assertEquals(restaurants, result);
-        verify(restaurantPersistencePort, times(1)).getAllRestaurants();
+        verify(restaurantPersistencePort, times(1)).getAllRestaurants(anyInt(), anyInt());
     }
 }

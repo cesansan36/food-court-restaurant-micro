@@ -26,6 +26,7 @@ import plazadecomidas.restaurants.util.ITokenUtils;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -176,7 +177,7 @@ class MealControllerAdapterTest {
         Meal meal = DomainTestData.getValidMeal(1L);
         MealResponse response = new MealResponse(1L, "Chocolate", "Delicious", 123456L, "https://picsum.photos/200", new Category(1L, "Desayuno", "Delicious"));
 
-        when(mealServicePort.getMealsOfRestaurant(anyLong())).thenReturn(List.of(meal));
+        when(mealServicePort.getMealsOfRestaurant(anyLong(), anyInt(), anyInt(), anyLong())).thenReturn(List.of(meal));
         when(mealResponseMapper.mealsToMealResponses(anyList())).thenReturn(List.of(response));
 
 

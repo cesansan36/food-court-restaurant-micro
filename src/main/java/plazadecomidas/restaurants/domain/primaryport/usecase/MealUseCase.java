@@ -21,6 +21,7 @@ public class MealUseCase implements IMealServicePort {
 
     @Override
     public void saveMeal(Meal meal, Long userId) {
+        throwIfCategoryNotExists(meal.getCategory().getId());
         throwIfRestaurantOwnerPairNotExists(meal.getRestaurant().getId(), userId);
         mealPersistencePort.saveMeal(meal);
     }
@@ -47,6 +48,7 @@ public class MealUseCase implements IMealServicePort {
 
     @Override
     public void updateMealAvailability(Meal meal, Long userId) {
+
         throwIfRestaurantOwnerPairNotExists(meal.getRestaurant().getId(), userId);
 
         Meal previousMeal = mealPersistencePort.getByNameAndRestaurantId(meal.getName(), meal.getRestaurant().getId());
@@ -65,8 +67,8 @@ public class MealUseCase implements IMealServicePort {
     }
 
     @Override
-    public List<Meal> getMealsOfRestaurant(Long restaurantId) {
-        return mealPersistencePort.getMealsOfRestaurant(restaurantId);
+    public List<Meal> getMealsOfRestaurant(Long restaurantId, Integer page, Integer size, Long idCategory) {
+        return mealPersistencePort.getMealsOfRestaurant(restaurantId, page, size, idCategory);
     }
 
     void throwIfRestaurantOwnerPairNotExists (Long idRestaurant, Long idOwner) {
@@ -74,6 +76,12 @@ public class MealUseCase implements IMealServicePort {
 
         if(!isRestaurantOwnerValid) {
             throw new DataMismatchException(DomainConstants.RESTAURANT_OWNER_MISMATCH_MESSAGE);
+        }
+    }
+
+    void throwIfCategoryNotExists(Long idCategory) {
+        if(!mealPersistencePort.existsCategory(idCategory)) {
+            throw new DataMismatchException(DomainConstants.CATEGORY_NOT_FOUND_MESSAGE);
         }
     }
 }

@@ -3,6 +3,8 @@ package plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.TestData.PersistenceTestData;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.MealEntity;
@@ -169,13 +171,13 @@ class MealAdapterTest {
         Meal meal = DomainTestData.getValidMeal(1L);
         MealEntity mealEntity = PersistenceTestData.getValidMealEntity(1L);
 
-        when(mealRepository.findByActiveTrueAndRestaurantId(anyLong())).thenReturn(List.of(mealEntity));
+        when(mealRepository.findActiveMealsByRestaurantAndCategory(anyLong(), anyLong(), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(mealEntity)));
         when(mealEntityMapper.toDomainList(anyList())).thenReturn(List.of(meal));
 
-        List<Meal> foundMeals = mealAdapter.getMealsOfRestaurant(1L);
+        List<Meal> foundMeals = mealAdapter.getMealsOfRestaurant(1L, 1, 1, 1L);
 
         assertAll(
-            () -> verify(mealRepository, times(1)).findByActiveTrueAndRestaurantId(anyLong()),
+            () -> verify(mealRepository, times(1)).findActiveMealsByRestaurantAndCategory(anyLong(), anyLong(), any(Pageable.class)),
             () -> verify(mealEntityMapper, times(1)).toDomainList(anyList()),
             () -> assertEquals(meal.getName(), foundMeals.getFirst().getName()),
             () -> assertEquals(meal.getDescription(), foundMeals.getFirst().getDescription()),

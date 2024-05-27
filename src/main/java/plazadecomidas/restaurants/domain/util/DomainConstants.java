@@ -3,6 +3,7 @@ package plazadecomidas.restaurants.domain.util;
 public class DomainConstants {
 
 
+
     private DomainConstants() {
         throw new IllegalStateException("Utility class");
     }
@@ -58,9 +59,11 @@ public class DomainConstants {
     }
 
     public static final String OWNER_ROLE = "ROLE_OWNER";
+    public static final Integer PHONE_NUMBER_MAX_LENGTH = 13;
 
+    public static final String CATEGORY_NOT_FOUND_MESSAGE = "The category doesn't exists";
     public static final String EMPTY_FIELD_MESSAGE = "The field %s cannot be empty";
-    public static final String PHONE_NUMBER_CHAR_AMOUNT_EXCEEDED = "The cell phone number can not have more than %s characters";
+    public static final String PHONE_NUMBER_NOT_VALID_MESSAGE = "The cell phone number can not have more than %s characters, can only contain a + sign at the start";
     public static final String NAME_INVALID_MESSAGE = "The name can only contain alphanumeric characters and must have at least 1 alphabetic character";
     public static final String NIT_INVALID_MESSAGE = "The nit can only contain numeric characters";
     public static final String OWNER_ID_INVALID_MESSAGE = "The Id of the user doesn't have the required role";

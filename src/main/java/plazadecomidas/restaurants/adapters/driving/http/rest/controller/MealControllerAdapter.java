@@ -73,9 +73,16 @@ public class MealControllerAdapter {
     @GetMapping("list")
     @PreAuthorize("hasRole('CLIENT')")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<List<MealResponse>> listMeals(@RequestParam Long restaurantId) {
+    public ResponseEntity<List<MealResponse>> listMeals(@RequestParam Long restaurantId,
+                                                        @RequestParam(defaultValue = "0") Integer page,
+                                                        @RequestParam(defaultValue = "5") Integer size,
+                                                        @RequestParam(defaultValue = "0") Long idCategory) {
 
-        List<MealResponse> results = mealResponseMapper.mealsToMealResponses(mealServicePort.getMealsOfRestaurant(restaurantId));
+        if (page < 0) { page = 0; }
+        if (size < 1) { size = 5; }
+
+        List<MealResponse> results = mealResponseMapper.mealsToMealResponses(
+                mealServicePort.getMealsOfRestaurant(restaurantId, page, size, idCategory));
 
         return ResponseEntity.ok(results);
     }

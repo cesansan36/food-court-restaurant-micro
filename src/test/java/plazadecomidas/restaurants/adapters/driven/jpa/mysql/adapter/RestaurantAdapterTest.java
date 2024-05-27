@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.TestData.PersistenceTestData;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.RestaurantEntity;
@@ -109,11 +111,11 @@ class RestaurantAdapterTest {
         List<RestaurantEntity> restaurantEntities = List.of(PersistenceTestData.getValidRestaurantEntity(1L, 1L));
         List<Restaurant> restaurants = List.of(DomainTestData.getValidRestaurant(1L, 1L));
 
-        when(restaurantRepository.findAll()).thenReturn(restaurantEntities);
+        when(restaurantRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(restaurantEntities));
         when(restaurantEntityMapper.toDomainList(anyList())).thenReturn(restaurants);
 
-        restaurantAdapter.getAllRestaurants();
-        verify(restaurantRepository, times(1)).findAll();
+        restaurantAdapter.getAllRestaurants(1, 1);
+        verify(restaurantRepository, times(1)).findAll(any(Pageable.class));
     }
 
     @ParameterizedTest

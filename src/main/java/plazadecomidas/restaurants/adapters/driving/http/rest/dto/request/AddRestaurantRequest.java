@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 public class AddRestaurantRequest {
 
-    private Long id;
     private String name;
     private String address;
     private Long ownerId;

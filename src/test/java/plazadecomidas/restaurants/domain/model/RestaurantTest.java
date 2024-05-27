@@ -84,7 +84,6 @@ class RestaurantTest {
     static Stream<Arguments> dataWithBrokenRules() {
         return Stream.of(
                 Arguments.of(1L, "59163846951", "Street 1", 1L, "123456789", "https://example.com/logo.png", "123456789"),
-                Arguments.of(null, "Restaurant 1", "Street 2", 2L, "+987654321", "https://example.com/logo.png", "987654321"),
                 Arguments.of(2L, "Restaurant%@1", "Street 2", 2L, "+987654321", "https://example.com/logo.png", "987654321"),
                 Arguments.of(2L, "Restaurant1", "Street 2", 2L, "-987654321", "https://example.com/logo.png", "987654321"),
                 Arguments.of(2L, "Restaurant1", "Street 2", 2L, "987+654321", "https://example.com/logo.png", "987654321"),

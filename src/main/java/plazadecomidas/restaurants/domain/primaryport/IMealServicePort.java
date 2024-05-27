@@ -12,5 +12,5 @@ public interface IMealServicePort {
 
     void updateMealAvailability(Meal meal, Long userId);
 
-    List<Meal> getMealsOfRestaurant(Long restaurantId);
+    List<Meal> getMealsOfRestaurant(Long restaurantId, Integer page, Integer size, Long idCategory);
 }

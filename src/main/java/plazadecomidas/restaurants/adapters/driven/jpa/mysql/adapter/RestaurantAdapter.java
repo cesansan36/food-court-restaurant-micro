@@ -1,6 +1,9 @@
 package plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.RestaurantEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryAlreadyExistsException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
@@ -42,8 +45,12 @@ public class RestaurantAdapter implements IRestaurantPersistencePort {
     }
 
     @Override
-    public List<Restaurant> getAllRestaurants() {
-        List<RestaurantEntity> restaurants = restaurantRepository.findAll();
+    public List<Restaurant> getAllRestaurants(Integer page, Integer size) {
+
+        Sort sort = Sort.by(Sort.Direction.ASC, "name");
+        Pageable pagination = PageRequest.of(page, size, sort);
+
+        List<RestaurantEntity> restaurants = restaurantRepository.findAll(pagination).getContent();
         return restaurantEntityMapper.toDomainList(restaurants);
     }
 

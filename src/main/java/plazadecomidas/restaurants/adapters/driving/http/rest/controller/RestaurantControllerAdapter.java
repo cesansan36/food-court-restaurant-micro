@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.request.AddRestaurantRequest;
 import plazadecomidas.restaurants.adapters.driving.http.rest.dto.response.RestaurantResponse;
@@ -40,10 +41,14 @@ public class RestaurantControllerAdapter {
     @GetMapping("list")
     @PreAuthorize("hasRole('CLIENT')")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<List<RestaurantResponse>> listRestaurants() {
+    public ResponseEntity<List<RestaurantResponse>> listRestaurants(@RequestParam(defaultValue = "0") Integer page,
+                                                                    @RequestParam(defaultValue = "5")  Integer size) {
+
+        if (page < 0) { page = 0; }
+        if (size < 1) { size = 5; }
 
         List<RestaurantResponse> restaurants = restaurantResponseMapper.restaurantsToRestaurantResponses(
-                restaurantServicePort.getAllRestaurants());
+                restaurantServicePort.getAllRestaurants(page, size));
 
         return ResponseEntity.ok(restaurants);
     }

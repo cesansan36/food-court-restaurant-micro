@@ -8,7 +8,7 @@ public class Validator {
 
     private static final String PHONE_NUMBER_PATTERN = "^(\\+)?\\d{1,13}$";
     private static final String NUMBERS_ONLY_PATTERN = "\\d+";
-    private static final String ALPHANUMERIC_WITH_AT_LEAST_ONE_LETTER_PATTERN = "^\\d*[a-zA-Z][a-zA-Z0-9]*$";
+    private static final String ALPHANUMERIC_WITH_AT_LEAST_ONE_LETTER_PATTERN = "^\\d*[a-zA-Z][a-zA-Z0-9 ]*$";
 
     private static final Pattern PHONE_NUMBER_REGEX = Pattern.compile(PHONE_NUMBER_PATTERN);
     private static final Pattern NUMBERS_ONLY_REGEX = Pattern.compile(NUMBERS_ONLY_PATTERN);
