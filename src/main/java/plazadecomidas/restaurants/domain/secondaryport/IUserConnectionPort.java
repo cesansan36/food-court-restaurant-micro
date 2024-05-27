@@ -4,5 +4,5 @@ public interface IUserConnectionPort {
 
     boolean verifyRole(Long idClient, String role);
 
-    public String getUserPhoneNumber(Long idClient, String token);
+    String getUserPhoneNumber(Long idClient, String token);
 }
