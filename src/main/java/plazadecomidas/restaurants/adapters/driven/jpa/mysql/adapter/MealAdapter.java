@@ -3,7 +3,6 @@ package plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.MealEntity;
-import plazadecomidas.restaurants.adapters.driven.jpa.mysql.entity.RestaurantEntity;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryAlreadyExistsException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IMealEntityMapper;
@@ -58,17 +57,6 @@ public class MealAdapter implements IMealPersistencePort {
 
         return mealEntityMapper.toDomainList(
                 mealRepository.findActiveMealsByRestaurantAndCategory(restaurantId, idCategory, pagination).getContent());
-    }
-
-    @Override
-    public boolean existsCategory(Long idCategory) {
-        Optional<MealEntity> mealEntity = mealRepository.findById(idCategory);
-
-        if (mealEntity.isEmpty()) {
-            throw new RegistryNotFoundException(PersistenceConstants.CATEGORY_NOT_FOUND_MESSAGE);
-        }
-
-        return true;
     }
 
     @Override

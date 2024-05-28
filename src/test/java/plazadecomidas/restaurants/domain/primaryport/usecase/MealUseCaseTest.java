@@ -5,7 +5,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.domain.exception.DataMismatchException;
+import plazadecomidas.restaurants.domain.exception.FieldNotFoundException;
 import plazadecomidas.restaurants.domain.model.Meal;
+import plazadecomidas.restaurants.domain.secondaryport.ICategoryPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IMealPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IRestaurantPersistencePort;
 
@@ -26,13 +28,15 @@ class MealUseCaseTest {
     private MealUseCase mealUseCase;
 
     private IMealPersistencePort mealPersistencePort;
+    private ICategoryPersistencePort categoryPersistencePort;
     private IRestaurantPersistencePort restaurantPersistencePort;
 
     @BeforeEach
     void setUp() {
         mealPersistencePort = mock(IMealPersistencePort.class);
+        categoryPersistencePort = mock(ICategoryPersistencePort.class);
         restaurantPersistencePort = mock(IRestaurantPersistencePort.class);
-        mealUseCase = new MealUseCase(mealPersistencePort, restaurantPersistencePort);
+        mealUseCase = new MealUseCase(mealPersistencePort, categoryPersistencePort, restaurantPersistencePort);
     }
 
     @Test
@@ -41,13 +45,46 @@ class MealUseCaseTest {
         Meal meal = DomainTestData.getValidMeal(1L);
         Long idUser = 1L;
 
+        when(categoryPersistencePort.existsCategory(anyLong())).thenReturn(true);
         when(restaurantPersistencePort.existsRestaurantOwnerPair(anyLong(), anyLong())).thenReturn(true);
-        when(mealPersistencePort.existsCategory(anyLong())).thenReturn(true);
 
         mealUseCase.saveMeal(meal, idUser);
 
         verify(mealPersistencePort, times(1)).saveMeal(any(Meal.class));
         verify(restaurantPersistencePort, times(1)).existsRestaurantOwnerPair(anyLong(), anyLong());
+        verify(categoryPersistencePort, times(1)).existsCategory(anyLong());
+    }
+
+    @Test
+    @DisplayName("Throw exception if restaurant owner pair not exists")
+    void saveMealThrowIfRestaurantOwnerPairNotExists() {
+        Meal meal = DomainTestData.getValidMeal(1L);
+        Long idUser = 1L;
+
+        when(restaurantPersistencePort.existsRestaurantOwnerPair(anyLong(), anyLong())).thenReturn(false);
+        when(categoryPersistencePort.existsCategory(anyLong())).thenReturn(true);
+
+        assertThrows(DataMismatchException.class, () -> mealUseCase.saveMeal(meal, idUser));
+
+        verify(mealPersistencePort, times(0)).saveMeal(any(Meal.class));
+        verify(restaurantPersistencePort, times(1)).existsRestaurantOwnerPair(anyLong(), anyLong());
+        verify(categoryPersistencePort, times(1)).existsCategory(anyLong());
+    }
+
+    @Test
+    @DisplayName("Throw exception if category not exists")
+    void saveMealThrowIfCategoryNotExists() {
+        Meal meal = DomainTestData.getValidMeal(1L);
+        Long idUser = 1L;
+
+        when(restaurantPersistencePort.existsRestaurantOwnerPair(anyLong(), anyLong())).thenReturn(true);
+        when(categoryPersistencePort.existsCategory(anyLong())).thenReturn(false);
+
+        assertThrows(FieldNotFoundException.class, () -> mealUseCase.saveMeal(meal, idUser));
+
+        verify(mealPersistencePort, times(0)).saveMeal(any(Meal.class));
+        verify(restaurantPersistencePort, times(0)).existsRestaurantOwnerPair(anyLong(), anyLong());
+        verify(categoryPersistencePort, times(1)).existsCategory(anyLong());
     }
 
     @Test
@@ -64,21 +101,6 @@ class MealUseCaseTest {
 
         verify(mealPersistencePort, times(1)).getByNameAndRestaurantId(anyString(), anyLong());
         verify(mealPersistencePort, times(1)).updateMeal(any(Meal.class));
-    }
-
-    @Test
-    @DisplayName("Throw exception if restaurant owner pair not exists")
-    void throwIfRestaurantOwnerPairNotExists() {
-        Meal meal = DomainTestData.getValidMeal(1L);
-        Long idUser = 1L;
-
-        when(restaurantPersistencePort.existsRestaurantOwnerPair(anyLong(), anyLong())).thenReturn(false);
-        when(mealPersistencePort.existsCategory(anyLong())).thenReturn(true);
-
-        assertThrows(DataMismatchException.class, () -> mealUseCase.saveMeal(meal, idUser));
-
-        verify(mealPersistencePort, times(0)).saveMeal(any(Meal.class));
-        verify(restaurantPersistencePort, times(1)).existsRestaurantOwnerPair(anyLong(), anyLong());
     }
 
     @Test

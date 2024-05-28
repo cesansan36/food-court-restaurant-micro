@@ -13,6 +13,7 @@ import plazadecomidas.restaurants.adapters.driving.http.rest.exception.IdMismatc
 import plazadecomidas.restaurants.domain.exception.ClientHasUnfinishedOrdersException;
 import plazadecomidas.restaurants.domain.exception.DataMismatchException;
 import plazadecomidas.restaurants.domain.exception.EmptyFieldException;
+import plazadecomidas.restaurants.domain.exception.FieldNotFoundException;
 import plazadecomidas.restaurants.domain.exception.FieldRuleInvalidException;
 
 import java.time.LocalDateTime;
@@ -75,6 +76,12 @@ public class ControllerAdvisor {
 
     @ExceptionHandler(WrongConditionsException.class)
     public ResponseEntity<ExceptionResponse> handleWrongConditionsException(WrongConditionsException exception) {
+        return ResponseEntity.badRequest().body(new ExceptionResponse(
+                exception.getMessage(), HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now()));
+    }
+
+    @ExceptionHandler(FieldNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleFieldNotFoundException(FieldNotFoundException exception) {
         return ResponseEntity.badRequest().body(new ExceptionResponse(
                 exception.getMessage(), HttpStatus.BAD_REQUEST.toString(), LocalDateTime.now()));
     }

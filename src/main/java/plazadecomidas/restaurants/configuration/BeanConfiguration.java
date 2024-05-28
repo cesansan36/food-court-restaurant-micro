@@ -8,6 +8,7 @@ import plazadecomidas.restaurants.adapters.driven.connection.adapter.UserAdapter
 import plazadecomidas.restaurants.adapters.driven.connection.feign.IMessagingFeignClient;
 import plazadecomidas.restaurants.adapters.driven.connection.feign.IUserFeignClient;
 import plazadecomidas.restaurants.adapters.driven.connection.mapper.ISendMessageRequestMapper;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.CategoryAdapter;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.EmployeeAdapter;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.MealAdapter;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.OrderAdapter;
@@ -16,6 +17,7 @@ import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IEmployeeEnti
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IMealEntityMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IOrderEntityMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.mapper.IRestaurantEntityMapper;
+import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.ICategoryRepository;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IEmployeeRepository;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IMealRepository;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IOrderRepository;
@@ -28,6 +30,7 @@ import plazadecomidas.restaurants.domain.primaryport.usecase.EmployeeUseCase;
 import plazadecomidas.restaurants.domain.primaryport.usecase.MealUseCase;
 import plazadecomidas.restaurants.domain.primaryport.usecase.OrderUseCase;
 import plazadecomidas.restaurants.domain.primaryport.usecase.RestaurantUseCase;
+import plazadecomidas.restaurants.domain.secondaryport.ICategoryPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IEmployeePersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IMealPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderMessagingPort;
@@ -66,8 +69,8 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public IMealServicePort mealServicePort(IMealPersistencePort mealPersistencePort, IRestaurantPersistencePort restaurantPersistencePort) {
-        return new MealUseCase(mealPersistencePort, restaurantPersistencePort);
+    public IMealServicePort mealServicePort(IMealPersistencePort mealPersistencePort, ICategoryPersistencePort categoryPersistencePort, IRestaurantPersistencePort restaurantPersistencePort) {
+        return new MealUseCase(mealPersistencePort, categoryPersistencePort, restaurantPersistencePort);
     }
 
     @Bean
@@ -78,6 +81,11 @@ public class BeanConfiguration {
     @Bean
     public IOrderServicePort orderServicePort(IOrderPersistencePort orderPersistencePort, IUserConnectionPort userConnectionPort, IOrderMessagingPort orderMessagingPort) {
         return new OrderUseCase(orderPersistencePort, userConnectionPort, orderMessagingPort);
+    }
+
+    @Bean
+    public ICategoryPersistencePort categoryPersistencePort(ICategoryRepository categoryRepository) {
+        return new CategoryAdapter(categoryRepository);
     }
 
     @Bean

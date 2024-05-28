@@ -1,8 +1,10 @@
 package plazadecomidas.restaurants.domain.primaryport.usecase;
 
 import plazadecomidas.restaurants.domain.exception.DataMismatchException;
+import plazadecomidas.restaurants.domain.exception.FieldNotFoundException;
 import plazadecomidas.restaurants.domain.model.Meal;
 import plazadecomidas.restaurants.domain.primaryport.IMealServicePort;
+import plazadecomidas.restaurants.domain.secondaryport.ICategoryPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IMealPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IRestaurantPersistencePort;
 import plazadecomidas.restaurants.domain.util.DomainConstants;
@@ -12,10 +14,12 @@ import java.util.List;
 public class MealUseCase implements IMealServicePort {
 
     private final IMealPersistencePort mealPersistencePort;
+    private final ICategoryPersistencePort categoryPersistencePort;
     private final IRestaurantPersistencePort restaurantPersistencePort;
 
-    public MealUseCase(IMealPersistencePort mealPersistencePort, IRestaurantPersistencePort restaurantPersistencePort) {
+    public MealUseCase(IMealPersistencePort mealPersistencePort, ICategoryPersistencePort categoryPersistencePort, IRestaurantPersistencePort restaurantPersistencePort) {
         this.mealPersistencePort = mealPersistencePort;
+        this.categoryPersistencePort = categoryPersistencePort;
         this.restaurantPersistencePort = restaurantPersistencePort;
     }
 
@@ -71,7 +75,7 @@ public class MealUseCase implements IMealServicePort {
         return mealPersistencePort.getMealsOfRestaurant(restaurantId, page, size, idCategory);
     }
 
-    void throwIfRestaurantOwnerPairNotExists (Long idRestaurant, Long idOwner) {
+    private void throwIfRestaurantOwnerPairNotExists (Long idRestaurant, Long idOwner) {
         boolean isRestaurantOwnerValid = restaurantPersistencePort.existsRestaurantOwnerPair(idRestaurant, idOwner);
 
         if(!isRestaurantOwnerValid) {
@@ -79,9 +83,9 @@ public class MealUseCase implements IMealServicePort {
         }
     }
 
-    void throwIfCategoryNotExists(Long idCategory) {
-        if(!mealPersistencePort.existsCategory(idCategory)) {
-            throw new DataMismatchException(DomainConstants.CATEGORY_NOT_FOUND_MESSAGE);
+    private void throwIfCategoryNotExists(Long idCategory) {
+        if(!categoryPersistencePort.existsCategory(idCategory)) {
+            throw new FieldNotFoundException(DomainConstants.CATEGORY_NOT_FOUND_MESSAGE);
         }
     }
 }

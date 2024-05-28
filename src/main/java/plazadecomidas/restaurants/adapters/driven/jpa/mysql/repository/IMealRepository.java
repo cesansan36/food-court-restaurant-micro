@@ -23,8 +23,6 @@ public interface IMealRepository extends JpaRepository<MealEntity, Long> {
             "AND m.active = true")
     Page<MealEntity> findActiveMealsByRestaurantAndCategory(Long restaurantId, Long categoryId, Pageable pageable);
 
-    // Page<OrderEntity> findAllByRestaurantIdAndStatus(Pageable pageable, Long restaurantId, String status);
-
     List<Long> findAllRestaurantIdsByIdIn(List<Long> ids);
 
     @Query("SELECT m.restaurant.id FROM MealEntity m WHERE m.id IN :mealIds")

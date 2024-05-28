@@ -185,6 +185,5 @@ class MealAdapterTest {
             () -> assertEquals(meal.getImageUrl(), foundMeals.getFirst().getImageUrl()),
             () -> assertEquals(meal.isActive(), foundMeals.getFirst().isActive())
         );
-
     }
 }
