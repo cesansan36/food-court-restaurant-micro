@@ -4,9 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import plazadecomidas.restaurants.adapters.driven.connection.adapter.MessagingAdapter;
-import plazadecomidas.restaurants.adapters.driven.connection.adapter.UserAdapter;
+import plazadecomidas.restaurants.adapters.driven.connection.adapter.TracingConnectionAdapter;
+import plazadecomidas.restaurants.adapters.driven.connection.adapter.UserConnectionAdapter;
 import plazadecomidas.restaurants.adapters.driven.connection.feign.IMessagingFeignClient;
+import plazadecomidas.restaurants.adapters.driven.connection.feign.ITracingFeignClient;
 import plazadecomidas.restaurants.adapters.driven.connection.feign.IUserFeignClient;
+import plazadecomidas.restaurants.adapters.driven.connection.mapper.IAddRecordRequestFeignMapper;
+import plazadecomidas.restaurants.adapters.driven.connection.mapper.IRecordResponseFeignMapper;
 import plazadecomidas.restaurants.adapters.driven.connection.mapper.ISendMessageRequestMapper;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.CategoryAdapter;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.adapter.EmployeeAdapter;
@@ -24,10 +28,12 @@ import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IOrderRep
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.repository.IRestaurantRepository;
 import plazadecomidas.restaurants.domain.primaryport.IEmployeeServicePort;
 import plazadecomidas.restaurants.domain.primaryport.IMealServicePort;
+import plazadecomidas.restaurants.domain.primaryport.IOrderRecordPrimaryPort;
 import plazadecomidas.restaurants.domain.primaryport.IOrderServicePort;
 import plazadecomidas.restaurants.domain.primaryport.IRestaurantServicePort;
 import plazadecomidas.restaurants.domain.primaryport.usecase.EmployeeUseCase;
 import plazadecomidas.restaurants.domain.primaryport.usecase.MealUseCase;
+import plazadecomidas.restaurants.domain.primaryport.usecase.OrderRecordUseCase;
 import plazadecomidas.restaurants.domain.primaryport.usecase.OrderUseCase;
 import plazadecomidas.restaurants.domain.primaryport.usecase.RestaurantUseCase;
 import plazadecomidas.restaurants.domain.secondaryport.ICategoryPersistencePort;
@@ -36,6 +42,7 @@ import plazadecomidas.restaurants.domain.secondaryport.IMealPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderMessagingPort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IRestaurantPersistencePort;
+import plazadecomidas.restaurants.domain.secondaryport.ITracingConnectionPort;
 import plazadecomidas.restaurants.domain.secondaryport.IUserConnectionPort;
 
 @Configuration
@@ -79,8 +86,11 @@ public class BeanConfiguration {
     }
 
     @Bean
-    public IOrderServicePort orderServicePort(IOrderPersistencePort orderPersistencePort, IUserConnectionPort userConnectionPort, IOrderMessagingPort orderMessagingPort) {
-        return new OrderUseCase(orderPersistencePort, userConnectionPort, orderMessagingPort);
+    public IOrderServicePort orderServicePort(IOrderPersistencePort orderPersistencePort,
+                                              IUserConnectionPort userConnectionPort,
+                                              IOrderMessagingPort orderMessagingPort,
+                                              IOrderRecordPrimaryPort orderRecordPrimaryPort) {
+        return new OrderUseCase(orderPersistencePort, userConnectionPort, orderMessagingPort, orderRecordPrimaryPort);
     }
 
     @Bean
@@ -106,6 +116,16 @@ public class BeanConfiguration {
 
     @Bean
     public IUserConnectionPort userConnectionPort(IUserFeignClient userFeignClient) {
-        return new UserAdapter(userFeignClient);
+        return new UserConnectionAdapter(userFeignClient);
+    }
+
+    @Bean
+    public IOrderRecordPrimaryPort orderRecordPrimaryPort(ITracingConnectionPort tracingConnectionPort, IUserConnectionPort userConnectionPort) {
+        return new OrderRecordUseCase(tracingConnectionPort, userConnectionPort);
+    }
+
+    @Bean
+    public ITracingConnectionPort tracingConnectionPort(ITracingFeignClient tracingFeignClient, IRecordResponseFeignMapper recordResponseFeignMapper, IAddRecordRequestFeignMapper recordRequestFeignMapper) {
+        return new TracingConnectionAdapter(tracingFeignClient, recordResponseFeignMapper, recordRequestFeignMapper);
     }
 }

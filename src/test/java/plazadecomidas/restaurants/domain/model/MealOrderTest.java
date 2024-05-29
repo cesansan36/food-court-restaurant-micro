@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class MealOrderTest {
 
     @ParameterizedTest
-    @DisplayName("Should create meal order correctly")
+    @DisplayName("Should createRecord meal order correctly")
     @MethodSource("correctData")
     void shouldCreateMealOrderCorrectly(Long idMeal, Long idOrder, Integer quantity) {
         MealOrder mealOrder = new MealOrder(idMeal, idOrder, quantity);

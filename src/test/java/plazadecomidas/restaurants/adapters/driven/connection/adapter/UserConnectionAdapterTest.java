@@ -14,16 +14,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class UserAdapterTest {
+class UserConnectionAdapterTest {
 
-    private UserAdapter userAdapter;
+    private UserConnectionAdapter userConnectionAdapter;
 
     private IUserFeignClient userFeignClient;
 
     @BeforeEach
     void setUp() {
         userFeignClient = mock(IUserFeignClient.class);
-        userAdapter = new UserAdapter(userFeignClient);
+        userConnectionAdapter = new UserConnectionAdapter(userFeignClient);
     }
 
     @Test
@@ -33,7 +33,7 @@ class UserAdapterTest {
 
         when(userFeignClient.verifyRole(anyLong(), anyString())).thenReturn(ResponseEntity.ok(true));
 
-        boolean result = userAdapter.verifyRole(idClient, role);
+        boolean result = userConnectionAdapter.verifyRole(idClient, role);
 
         assertTrue(result);
         verify(userFeignClient, times(1)).verifyRole(idClient, role);
@@ -46,7 +46,7 @@ class UserAdapterTest {
 
         when(userFeignClient.getNumber(anyString(), anyLong())).thenReturn(ResponseEntity.ok("123456789"));
 
-        String result = userAdapter.getUserPhoneNumber(idClient, token);
+        String result = userConnectionAdapter.getUserPhoneNumber(idClient, token);
 
         assertEquals("123456789", result);
         verify(userFeignClient, times(1)).getNumber(token, idClient);

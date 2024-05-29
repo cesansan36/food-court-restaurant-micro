@@ -7,11 +7,11 @@ import java.util.List;
 public interface IOrderPersistencePort {
     int getAmountOfUnfinishedOrders(Long clientId);
 
-    void saveOrder(Order order);
+    Order saveOrder(Order order);
 
     List<Order> getOrdersByStatus(Long userId, Integer page, Integer size, String status);
 
-    void updateOrderPreparing(Order order);
+    Order updateOrderPreparing(Order order);
 
     Order updateOrderReady(Order order);
 

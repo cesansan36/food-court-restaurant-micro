@@ -125,7 +125,7 @@ class OrderControllerAdapterTest {
         when(orderResponseMapper.ordersToOrderResponses(anyList())).thenReturn(List.of(orderResponse));
         when(orderServicePort.getOrdersByStatus(anyLong(), anyInt(), anyInt(), anyString())).thenReturn(List.of(order));
 
-        MockHttpServletRequestBuilder request = get("/orders/list")
+        MockHttpServletRequestBuilder request = get("/orders/listRecords")
                 .header(HttpHeaders.AUTHORIZATION, bearerToken)
                 .param("page", String.valueOf(page))
                 .param("size", String.valueOf(size))

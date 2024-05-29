@@ -3,7 +3,7 @@ package plazadecomidas.restaurants.adapters.driven.connection.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import plazadecomidas.restaurants.adapters.driven.connection.dto.SendMessageRequest;
+import plazadecomidas.restaurants.adapters.driven.connection.dto.request.SendMessageRequest;
 import plazadecomidas.restaurants.domain.model.Order;
 
 @Mapper(componentModel = "spring")

@@ -33,7 +33,7 @@ public class OrderAdapter implements IOrderPersistencePort {
     }
 
     @Override
-    public void saveOrder(Order order) {
+    public Order saveOrder(Order order) {
 
         OrderEntity orderEntity = orderEntityMapper.orderToOrderEntity(order);
         List<Long> mealIds = orderEntity.getMeals().stream().map(x -> x.getMeal().getId()).toList();
@@ -49,7 +49,7 @@ public class OrderAdapter implements IOrderPersistencePort {
             orderMealEntity.setOrder(orderEntity);
         }
 
-        orderRepository.save(orderEntity);
+        return orderEntityMapper.orderEntityToOrder(orderRepository.save(orderEntity));
     }
 
     @Override
@@ -75,7 +75,7 @@ public class OrderAdapter implements IOrderPersistencePort {
     }
 
     @Override
-    public void updateOrderPreparing(Order order) {
+    public Order updateOrderPreparing(Order order) {
         OrderEntity registeredOrder = orderRepository.findById(order.getId()).orElseThrow(
                 () -> new RegistryNotFoundException(PersistenceConstants.ORDER_NOT_FOUND_MESSAGE));
 
@@ -90,7 +90,9 @@ public class OrderAdapter implements IOrderPersistencePort {
 
         registeredOrder.setStatus(order.getStatus());
         registeredOrder.setIdChef(order.getIdChef());
-        orderRepository.save(registeredOrder);
+        OrderEntity updatedOrder = orderRepository.save(registeredOrder);
+
+        return orderEntityMapper.orderEntityToOrder(updatedOrder);
     }
 
     @Override

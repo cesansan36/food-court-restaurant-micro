@@ -36,6 +36,7 @@ public class DomainConstants {
     }
 
     public enum OrderStatus {
+        NOT_CREATED,
         PENDING,
         PREPARING,
         READY,

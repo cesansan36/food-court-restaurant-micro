@@ -88,7 +88,7 @@ class RestaurantControllerAdapterTest {
         when(restaurantServicePort.getAllRestaurants(anyInt(), anyInt())).thenReturn(restaurants);
         when(restaurantResponseMapper.restaurantsToRestaurantResponses(anyList())).thenReturn(List.of(response));
 
-        MockHttpServletRequestBuilder request = get("/restaurants/list");
+        MockHttpServletRequestBuilder request = get("/restaurants/listRecords");
 
         mockMvc.perform(request)
                 .andDo(print())

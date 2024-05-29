@@ -181,7 +181,7 @@ class MealControllerAdapterTest {
         when(mealResponseMapper.mealsToMealResponses(anyList())).thenReturn(List.of(response));
 
 
-        MockHttpServletRequestBuilder request = get("/meals/list")
+        MockHttpServletRequestBuilder request = get("/meals/listRecords")
                 .param("restaurantId", String.valueOf(restaurantId));
 
         mockMvc.perform(request)

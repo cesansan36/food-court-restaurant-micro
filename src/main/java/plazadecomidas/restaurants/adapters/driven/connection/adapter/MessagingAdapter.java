@@ -1,7 +1,7 @@
 package plazadecomidas.restaurants.adapters.driven.connection.adapter;
 
 import lombok.RequiredArgsConstructor;
-import plazadecomidas.restaurants.adapters.driven.connection.dto.SendMessageRequest;
+import plazadecomidas.restaurants.adapters.driven.connection.dto.request.SendMessageRequest;
 import plazadecomidas.restaurants.adapters.driven.connection.feign.IMessagingFeignClient;
 import plazadecomidas.restaurants.adapters.driven.connection.mapper.ISendMessageRequestMapper;
 import plazadecomidas.restaurants.domain.model.Order;

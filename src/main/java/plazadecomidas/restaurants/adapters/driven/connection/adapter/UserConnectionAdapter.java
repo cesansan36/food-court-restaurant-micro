@@ -6,7 +6,7 @@ import plazadecomidas.restaurants.adapters.driven.connection.feign.IUserFeignCli
 import plazadecomidas.restaurants.domain.secondaryport.IUserConnectionPort;
 
 @RequiredArgsConstructor
-public class UserAdapter implements IUserConnectionPort {
+public class UserConnectionAdapter implements IUserConnectionPort {
 
     private final IUserFeignClient userFeignClient;
 
@@ -19,6 +19,12 @@ public class UserAdapter implements IUserConnectionPort {
     @Override
     public String getUserPhoneNumber(Long idClient, String token) {
         ResponseEntity<String> response = userFeignClient.getNumber(token, idClient);
+        return response.getBody();
+    }
+
+    @Override
+    public String getUserEmail(String token) {
+        ResponseEntity<String> response = userFeignClient.getEmail(token);
         return response.getBody();
     }
 }

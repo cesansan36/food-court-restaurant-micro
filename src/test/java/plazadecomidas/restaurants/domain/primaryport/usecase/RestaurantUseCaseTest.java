@@ -81,7 +81,7 @@ class RestaurantUseCaseTest {
     }
 
     @Test
-    @DisplayName("Get list of restaurants")
+    @DisplayName("Get listRecords of restaurants")
     void getAllRestaurants() {
         List<Restaurant> restaurants = List.of(DomainTestData.getValidRestaurant(1L, 1L));
         when(restaurantPersistencePort.getAllRestaurants(anyInt(), anyInt())).thenReturn(restaurants);

@@ -4,6 +4,7 @@ import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNo
 import plazadecomidas.restaurants.domain.exception.ClientHasUnfinishedOrdersException;
 import plazadecomidas.restaurants.domain.model.OperationResult;
 import plazadecomidas.restaurants.domain.model.Order;
+import plazadecomidas.restaurants.domain.primaryport.IOrderRecordPrimaryPort;
 import plazadecomidas.restaurants.domain.primaryport.IOrderServicePort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderMessagingPort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderPersistencePort;
@@ -18,18 +19,20 @@ public class OrderUseCase implements IOrderServicePort {
     private final IOrderPersistencePort orderPersistencePort;
     private final IUserConnectionPort userConnectionPort;
     private final IOrderMessagingPort orderMessagingPort;
+    private final IOrderRecordPrimaryPort orderRecordPrimaryPort;
     private final Random random;
 
-    public OrderUseCase(IOrderPersistencePort orderPersistencePort, IUserConnectionPort userConnectionPort, IOrderMessagingPort orderMessagingPort) {
+    public OrderUseCase(IOrderPersistencePort orderPersistencePort, IUserConnectionPort userConnectionPort, IOrderMessagingPort orderMessagingPort, IOrderRecordPrimaryPort orderRecordPrimaryPort) {
         this.orderPersistencePort = orderPersistencePort;
         this.userConnectionPort = userConnectionPort;
         this.orderMessagingPort = orderMessagingPort;
+        this.orderRecordPrimaryPort = orderRecordPrimaryPort;
 
         random = new Random();
     }
 
     @Override
-    public void saveOrder(Order order) {
+    public void saveOrder(Order order, String token) {
 
         int unfinishedOrders = orderPersistencePort.getAmountOfUnfinishedOrders(order.getIdClient());
         if (unfinishedOrders > 0) {
@@ -49,7 +52,9 @@ public class OrderUseCase implements IOrderServicePort {
                 order.getMeals()
         );
 
-        orderPersistencePort.saveOrder(orderWithPin);
+        Order savedOrder = orderPersistencePort.saveOrder(orderWithPin);
+
+        orderRecordPrimaryPort.createOrderRecord(savedOrder, token);
     }
 
     @Override
@@ -58,8 +63,10 @@ public class OrderUseCase implements IOrderServicePort {
     }
 
     @Override
-    public void updateOrderPreparing(Order order) {
-        orderPersistencePort.updateOrderPreparing(order);
+    public void updateOrderPreparing(Order order, String token) {
+        Order updatedOrder = orderPersistencePort.updateOrderPreparing(order);
+
+        orderRecordPrimaryPort.assignChefToOrder(updatedOrder, token);
     }
 
     @Override
@@ -74,19 +81,22 @@ public class OrderUseCase implements IOrderServicePort {
             throw new RegistryNotFoundException(DomainConstants.USER_ID_NOT_FOUND_MESSAGE);
         }
 
+        orderRecordPrimaryPort.updateOrderToReady(updatedOrder, token);
         orderMessagingPort.sendOrderReadyMessage(token, updatedOrder, phoneNumber);
     }
 
     @Override
-    public void updateOrderDelivered(Order order) {
+    public void updateOrderDelivered(Order order, String token) {
         orderPersistencePort.updateOrderDelivered(order);
+        orderRecordPrimaryPort.updateOrderToDelivered(order, token);
     }
 
     @Override
-    public OperationResult updateOrderCancelled(Order order) {
+    public OperationResult updateOrderCancelled(Order order, String token) {
         boolean result = orderPersistencePort.tryCancelOrder(order);
 
         if (result) {
+            orderRecordPrimaryPort.updateOrderToCancelled(order, token);
             return new OperationResult(true, DomainConstants.ORDER_CANCELLED_SUCCESS_MESSAGE);
         } else {
             return new OperationResult(false, DomainConstants.ORDER_CANCELLED_FAILED_MESSAGE);

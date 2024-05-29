@@ -46,7 +46,7 @@ public class OrderControllerAdapter {
 
         orderServicePort.saveOrder(
                 orderRequestMapper.addOrderRequestToOrder(
-                        addOrderRequest, userId, ControllerConstants.OrderStatus.PENDING.toString()));
+                        addOrderRequest, userId, ControllerConstants.OrderStatus.PENDING.toString()), token);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -60,7 +60,7 @@ public class OrderControllerAdapter {
         OrderCancelledResponse result = orderCancelledResponseMapper.toCancelledResponse(
                 orderServicePort.updateOrderCancelled(
                 orderRequestMapper.updateOrderCancelledRequestToOrder(
-                        request, userId, ControllerConstants.OrderStatus.CANCELLED.name())));
+                        request, userId, ControllerConstants.OrderStatus.CANCELLED.name()), token));
 
         if (result.success()) {
             return ResponseEntity.ok(result.message());
@@ -96,7 +96,7 @@ public class OrderControllerAdapter {
 
         orderServicePort.updateOrderPreparing(
                 orderRequestMapper.updateOrderRequestToOrder(
-                        request, userId, ControllerConstants.OrderStatus.PREPARING.toString()));
+                        request, userId, ControllerConstants.OrderStatus.PREPARING.toString()), token);
 
         return ResponseEntity.ok().build();
     }
@@ -117,11 +117,11 @@ public class OrderControllerAdapter {
     @PutMapping("set_delivered")
     @PreAuthorize("hasRole('EMPLOYEE')")
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Void> setDelivered(@RequestBody UpdateOrderToDeliveredRequest request) {
+    public ResponseEntity<Void> setDelivered(@RequestHeader("Authorization") String token, @RequestBody UpdateOrderToDeliveredRequest request) {
 
         orderServicePort.updateOrderDelivered(
                 orderRequestMapper.updateOrderToDeliveredRequestToOrder(
-                        request, ControllerConstants.OrderStatus.DELIVERED.name()));
+                        request, ControllerConstants.OrderStatus.DELIVERED.name()), token);
 
         return ResponseEntity.ok().build();
     }

@@ -14,4 +14,7 @@ public interface IUserFeignClient {
 
     @GetMapping("/get-number")
     ResponseEntity<String> getNumber(@RequestHeader("Authorization") String token, @RequestParam Long id);
+
+    @GetMapping("/get-email")
+    ResponseEntity<String> getEmail(@RequestHeader("Authorization") String token);
 }
