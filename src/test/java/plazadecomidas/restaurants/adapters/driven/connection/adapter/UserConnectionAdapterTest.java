@@ -51,4 +51,17 @@ class UserConnectionAdapterTest {
         assertEquals("123456789", result);
         verify(userFeignClient, times(1)).getNumber(token, idClient);
     }
+
+    @Test
+    void getUserEmail() {
+        String token = "Bearer token";
+        String email = "XaJpI@example.com";
+
+        when(userFeignClient.getEmail(anyString())).thenReturn(ResponseEntity.ok(email));
+
+        String result = userConnectionAdapter.getUserEmail(token);
+
+        assertEquals(email, result);
+        verify(userFeignClient, times(1)).getEmail(token);
+    }
 }

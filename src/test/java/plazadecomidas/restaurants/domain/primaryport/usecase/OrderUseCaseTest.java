@@ -1,14 +1,16 @@
 package plazadecomidas.restaurants.domain.primaryport.usecase;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import plazadecomidas.restaurants.TestData.DomainTestData;
 import plazadecomidas.restaurants.adapters.driven.jpa.mysql.exception.RegistryNotFoundException;
 import plazadecomidas.restaurants.domain.exception.ClientHasUnfinishedOrdersException;
 import plazadecomidas.restaurants.domain.model.OperationResult;
 import plazadecomidas.restaurants.domain.model.Order;
+import plazadecomidas.restaurants.domain.primaryport.IOrderRecordPrimaryPort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderMessagingPort;
 import plazadecomidas.restaurants.domain.secondaryport.IOrderPersistencePort;
 import plazadecomidas.restaurants.domain.secondaryport.IUserConnectionPort;
@@ -27,29 +29,24 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class OrderUseCaseTest {
 
-    private OrderUseCase orderUseCase;
+    @InjectMocks private OrderUseCase orderUseCase;
 
-    private IOrderPersistencePort orderPersistencePort;
-    private IUserConnectionPort userConnectionPort;
-    private IOrderMessagingPort orderMessagingPort;
-
-    @BeforeEach
-    void setUp() {
-        orderPersistencePort = mock(IOrderPersistencePort.class);
-        userConnectionPort = mock(IUserConnectionPort.class);
-        orderMessagingPort = mock(IOrderMessagingPort.class);
-        orderUseCase = new OrderUseCase(orderPersistencePort, userConnectionPort, orderMessagingPort);
-    }
+    @Mock private IOrderPersistencePort orderPersistencePort;
+    @Mock private IUserConnectionPort userConnectionPort;
+    @Mock private IOrderMessagingPort orderMessagingPort;
+    @Mock private IOrderRecordPrimaryPort orderRecordPrimaryPort;
 
     @Test
     void saveOrderCorrectly() {
         Order order = DomainTestData.getValidOrder(1L);
+        String bearerToken = "bearerToken";
 
         when(orderPersistencePort.getAmountOfUnfinishedOrders(anyLong())).thenReturn(0);
 
-        orderUseCase.saveOrder(order);
+        orderUseCase.saveOrder(order, bearerToken);
 
         verify(orderPersistencePort, times(1)).saveOrder(any(Order.class));
         verify(orderPersistencePort, times(1)).getAmountOfUnfinishedOrders(anyLong());
@@ -58,10 +55,11 @@ class OrderUseCaseTest {
     @Test
     void saveOrderFailBecauseOfUnfinishedOrders() {
         Order order = DomainTestData.getValidOrder(1L);
+        String bearerToken = "bearerToken";
 
         when(orderPersistencePort.getAmountOfUnfinishedOrders(anyLong())).thenReturn(1);
 
-        assertThrows(ClientHasUnfinishedOrdersException.class, () -> orderUseCase.saveOrder(order));
+        assertThrows(ClientHasUnfinishedOrdersException.class, () -> orderUseCase.saveOrder(order, bearerToken));
 
         verify(orderPersistencePort, times(0)).saveOrder(order);
         verify(orderPersistencePort, times(1)).getAmountOfUnfinishedOrders(anyLong());
@@ -84,8 +82,9 @@ class OrderUseCaseTest {
     @Test
     void updateOrderPreparing() {
         Order order = DomainTestData.getValidOrder(1L);
+        String bearerToken = "bearerToken";
 
-        orderUseCase.updateOrderPreparing(order);
+        orderUseCase.updateOrderPreparing(order, bearerToken);
 
         verify(orderPersistencePort, times(1)).updateOrderPreparing(order);
     }
@@ -123,8 +122,9 @@ class OrderUseCaseTest {
     @Test
     void updateOrderDelivered() {
         Order order = DomainTestData.getValidOrder(1L);
+        String bearerToken = "bearerToken";
 
-        orderUseCase.updateOrderDelivered(order);
+        orderUseCase.updateOrderDelivered(order, bearerToken);
 
         verify(orderPersistencePort, times(1)).updateOrderDelivered(order);
     }
@@ -134,10 +134,11 @@ class OrderUseCaseTest {
         boolean result = true;
         String message = "The order was cancelled successfully";
         Order order = mock(Order.class);
+        String bearerToken = "bearerToken";
 
         when(orderPersistencePort.tryCancelOrder(order)).thenReturn(result);
 
-        OperationResult operationResult = orderUseCase.updateOrderCancelled(order);
+        OperationResult operationResult = orderUseCase.updateOrderCancelled(order, bearerToken);
 
         assertEquals(result, operationResult.isSuccess());
         assertEquals(message, operationResult.getMessage());
@@ -148,10 +149,11 @@ class OrderUseCaseTest {
         boolean result = false;
         String message = "Lo sentimos, tu pedido ya está en preparación y no puede cancelarse";
         Order order = mock(Order.class);
+        String bearerToken = "bearerToken";
 
         when(orderPersistencePort.tryCancelOrder(order)).thenReturn(result);
 
-        OperationResult operationResult = orderUseCase.updateOrderCancelled(order);
+        OperationResult operationResult = orderUseCase.updateOrderCancelled(order, bearerToken);
 
         assertEquals(result, operationResult.isSuccess());
         assertEquals(message, operationResult.getMessage());

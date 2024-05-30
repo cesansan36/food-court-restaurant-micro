@@ -37,8 +37,8 @@ public class TracingConnectionAdapter implements ITracingConnectionPort {
     }
 
     @Override
-    public OrderRecord findRecordByOrderIdAndStatus(Long id, String name, String token) {
+    public OrderRecord findRecordByOrderIdAndStatus(Long id, String status, String token) {
         return recordResponseFeignMapper.recordResponseToRecord(
-                tracingFeignClient.findRecordByOrderIdAndStatus(token, id, name).getBody());
+                tracingFeignClient.findRecordByOrderIdAndStatus(token, id, status).getBody());
     }
 }

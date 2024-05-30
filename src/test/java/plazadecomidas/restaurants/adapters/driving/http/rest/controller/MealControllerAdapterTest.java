@@ -172,8 +172,12 @@ class MealControllerAdapterTest {
 
     @Test
     void getAllActiveMealsFromRestaurant() throws Exception {
-
         Long restaurantId = 1L;
+        Integer page = 0;
+        Integer size = 5;
+        Long idCategory = 1L;
+        String bearerToken = "Bearer 123456789";
+
         Meal meal = DomainTestData.getValidMeal(1L);
         MealResponse response = new MealResponse(1L, "Chocolate", "Delicious", 123456L, "https://picsum.photos/200", new Category(1L, "Desayuno", "Delicious"));
 
@@ -181,8 +185,12 @@ class MealControllerAdapterTest {
         when(mealResponseMapper.mealsToMealResponses(anyList())).thenReturn(List.of(response));
 
 
-        MockHttpServletRequestBuilder request = get("/meals/listRecords")
-                .param("restaurantId", String.valueOf(restaurantId));
+        MockHttpServletRequestBuilder request = get("/meals/list")
+                .param("restaurantId", String.valueOf(restaurantId))
+                .param("page", String.valueOf(page))
+                .param("size", String.valueOf(size))
+                .param("idCategory", String.valueOf(idCategory))
+                .header(HttpHeaders.AUTHORIZATION, bearerToken);
 
         mockMvc.perform(request)
                 .andDo(print())

@@ -21,7 +21,7 @@ public class OrderRecordUseCase implements IOrderRecordPrimaryPort {
     }
 
     @Override
-    public List<OrderRecord> listRecords(String token,Long clientId) {
+    public List<OrderRecord> listRecords(String token, Long clientId) {
         return tracingConnectionPort.list(token, clientId);
     }
 

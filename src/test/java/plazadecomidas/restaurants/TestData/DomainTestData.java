@@ -4,9 +4,11 @@ import plazadecomidas.restaurants.domain.model.Category;
 import plazadecomidas.restaurants.domain.model.Meal;
 import plazadecomidas.restaurants.domain.model.MealOrder;
 import plazadecomidas.restaurants.domain.model.Order;
+import plazadecomidas.restaurants.domain.model.OrderRecord;
 import plazadecomidas.restaurants.domain.model.Restaurant;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class DomainTestData {
@@ -42,5 +44,18 @@ public class DomainTestData {
 
     public static Order getValidOrder (Long id) {
         return new Order(id, id, LocalDate.now(), "PENDING", 1111, id, id, List.of(getValidMealOrder(id)));
+    }
+
+    public static OrderRecord getValidOrderRecord (Long id) {
+        return new OrderRecord(
+                id.toString(),
+                id,
+                id,
+                "client%s@email.com".formatted(id),
+                LocalDateTime.now(),
+                "PENDING",
+                "PREPARING",
+                id,
+                "employee%s@somemail.com".formatted(id));
     }
 }

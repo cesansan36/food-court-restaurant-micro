@@ -104,7 +104,7 @@ class OrderControllerAdapterTest {
         verify(tokenUtils, times(1)).getSpecificClaim(any(DecodedJWT.class), anyString());
         verify(tokenUtils, times(1)).validateToken(anyString());
         verify(orderRequestMapper, times(1)).addOrderRequestToOrder(any(AddOrderRequest.class), anyLong(), anyString());
-        verify(orderServicePort, times(1)).saveOrder(any(Order.class));
+        verify(orderServicePort, times(1)).saveOrder(any(Order.class), anyString());
     }
 
     @ParameterizedTest
@@ -125,7 +125,7 @@ class OrderControllerAdapterTest {
         when(orderResponseMapper.ordersToOrderResponses(anyList())).thenReturn(List.of(orderResponse));
         when(orderServicePort.getOrdersByStatus(anyLong(), anyInt(), anyInt(), anyString())).thenReturn(List.of(order));
 
-        MockHttpServletRequestBuilder request = get("/orders/listRecords")
+        MockHttpServletRequestBuilder request = get("/orders/list")
                 .header(HttpHeaders.AUTHORIZATION, bearerToken)
                 .param("page", String.valueOf(page))
                 .param("size", String.valueOf(size))
@@ -171,7 +171,7 @@ class OrderControllerAdapterTest {
         verify(tokenUtils, times(1)).getSpecificClaim(any(DecodedJWT.class), anyString());
         verify(tokenUtils, times(1)).validateToken(anyString());
         verify(orderRequestMapper, times(1)).updateOrderRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString());
-        verify(orderServicePort, times(1)).updateOrderPreparing(any(Order.class));
+        verify(orderServicePort, times(1)).updateOrderPreparing(any(Order.class), anyString());
     }
 
     @Test
@@ -215,10 +215,12 @@ class OrderControllerAdapterTest {
         String inputJson = objectMapper.writeValueAsString(inputObject);
 
         Order order = DomainTestData.getValidOrder(1L);
+        String bearerToken = "Bearer 123456789";
 
         when(orderRequestMapper.updateOrderToDeliveredRequestToOrder(any(UpdateOrderToDeliveredRequest.class), anyString())).thenReturn(order);
 
         MockHttpServletRequestBuilder request = put("/orders/set_delivered")
+                .header(HttpHeaders.AUTHORIZATION, bearerToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(inputJson);
 
@@ -227,7 +229,7 @@ class OrderControllerAdapterTest {
                 .andExpect(status().isOk());
 
         verify(orderRequestMapper, times(1)).updateOrderToDeliveredRequestToOrder(any(UpdateOrderToDeliveredRequest.class), anyString());
-        verify(orderServicePort, times(1)).updateOrderDelivered(any(Order.class));
+        verify(orderServicePort, times(1)).updateOrderDelivered(any(Order.class), anyString());
     }
 
     @Test
@@ -247,7 +249,7 @@ class OrderControllerAdapterTest {
         when(tokenUtils.validateToken(anyString())).thenReturn(mock(DecodedJWT.class));
         when(tokenUtils.getSpecificClaim(any(DecodedJWT.class), anyString())).thenReturn(claim);
         when(orderRequestMapper.updateOrderCancelledRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString())).thenReturn(order);
-        when(orderServicePort.updateOrderCancelled(any(Order.class))).thenReturn(operationResult);
+        when(orderServicePort.updateOrderCancelled(any(Order.class), anyString())).thenReturn(operationResult);
         when(orderCancelledResponseMapper.toCancelledResponse(any(OperationResult.class))).thenReturn(operationResponse);
 
         MockHttpServletRequestBuilder request = put("/orders/cancel")
@@ -264,7 +266,7 @@ class OrderControllerAdapterTest {
         verify(tokenUtils, times(1)).getSpecificClaim(any(DecodedJWT.class), anyString());
         verify(tokenUtils, times(1)).validateToken(anyString());
         verify(orderRequestMapper, times(1)).updateOrderCancelledRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString());
-        verify(orderServicePort, times(1)).updateOrderCancelled(any(Order.class));
+        verify(orderServicePort, times(1)).updateOrderCancelled(any(Order.class), anyString());
         verify(orderCancelledResponseMapper, times(1)).toCancelledResponse(any(OperationResult.class));
 
         String response = result.getResponse().getContentAsString();
@@ -288,7 +290,7 @@ class OrderControllerAdapterTest {
         when(tokenUtils.validateToken(anyString())).thenReturn(mock(DecodedJWT.class));
         when(tokenUtils.getSpecificClaim(any(DecodedJWT.class), anyString())).thenReturn(claim);
         when(orderRequestMapper.updateOrderCancelledRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString())).thenReturn(order);
-        when(orderServicePort.updateOrderCancelled(any(Order.class))).thenReturn(operationResult);
+        when(orderServicePort.updateOrderCancelled(any(Order.class), anyString())).thenReturn(operationResult);
         when(orderCancelledResponseMapper.toCancelledResponse(any(OperationResult.class))).thenReturn(operationResponse);
 
         MockHttpServletRequestBuilder request = put("/orders/cancel")
@@ -305,7 +307,7 @@ class OrderControllerAdapterTest {
         verify(tokenUtils, times(1)).getSpecificClaim(any(DecodedJWT.class), anyString());
         verify(tokenUtils, times(1)).validateToken(anyString());
         verify(orderRequestMapper, times(1)).updateOrderCancelledRequestToOrder(any(UpdateOrderRequest.class), anyLong(), anyString());
-        verify(orderServicePort, times(1)).updateOrderCancelled(any(Order.class));
+        verify(orderServicePort, times(1)).updateOrderCancelled(any(Order.class), anyString());
         verify(orderCancelledResponseMapper, times(1)).toCancelledResponse(any(OperationResult.class));
 
         String response = result.getResponse().getContentAsString();
